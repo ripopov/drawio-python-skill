@@ -79,7 +79,7 @@ class _ResultParser(HTMLParser):
 
 
 def native_check(source, *, page=None, browser=None, webapp=None, asar=None,
-                 padding=2, timeout=60, no_sandbox=False):
+                 padding=2, timeout=60, no_sandbox=False, _fix=None):
     """Return measured overlaps; source is never changed. page=None checks all pages."""
     from drawio_arch import Diagram
     if not math.isfinite(padding) or padding < 0 or not math.isfinite(timeout) or timeout <= 0:
@@ -110,7 +110,7 @@ def native_check(source, *, page=None, browser=None, webapp=None, asar=None,
         pages = [{'index': i, 'name': p.diagram.get('name'),
                   'xml': ET.tostring(p.model, encoding='unicode')}
                  for i, p in enumerate(doc.pages) if page is None or i == page]
-        payload = {'pages': pages, 'padding': padding}
+        payload = {'pages': pages, 'padding': padding, 'fix': _fix}
         (temporary / 'input.js').write_text('const nativeCheckInput = ' + json.dumps(payload) + ';\n', encoding='utf-8')
         # Only local/data resources are available. This does not control a user's browser profile.
         html = '''<!doctype html><html><head><meta charset="utf-8">
@@ -119,7 +119,10 @@ def native_check(source, *, page=None, browser=None, webapp=None, asar=None,
         html += '<link rel="stylesheet" href="' + (assets / 'mxgraph/css/common.css').as_uri() + '">\n'
         for name in ('js/export-init.js', 'js/app.min.js', 'js/stencils.min.js', 'js/shapes-14-6-5.min.js'):
             html += '<script src="' + (assets / name).as_uri() + '"></script>\n'
-        html += '</head><body><script src="input.js"></script><script src="' + Path(__file__).with_name('native_check.js').resolve().as_uri() + '"></script></body></html>'
+        html += '</head><body><script src="input.js"></script>'
+        if _fix:
+            html += '<script src="' + Path(__file__).with_name('native_fix.js').resolve().as_uri() + '"></script>'
+        html += '<script src="' + Path(__file__).with_name('native_check.js').resolve().as_uri() + '"></script></body></html>'
         harness = temporary / 'check.html'
         harness.write_text(html, encoding='utf-8')
         cmd = [str(browser), '--headless', '--disable-gpu', '--no-first-run', '--no-default-browser-check',

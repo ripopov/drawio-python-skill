@@ -665,6 +665,10 @@ def main():
     inspect.add_argument('source')
     from drawio_native import add_arguments, run as run_native_check
     add_arguments(commands.add_parser('native-check', help='Optional offline rendered label collision report (requires Draw.io assets and Chromium)'))
+    from drawio_fix import add_arguments as add_fix_arguments, run as run_native_fix
+    add_fix_arguments(commands.add_parser('native-fix', help='Conservative label-offset repair; verified dry-run unless --output is supplied'))
+    from drawio_stack import add_arguments as add_stack_arguments, run as run_native_stack_fix
+    add_stack_arguments(commands.add_parser('native-stack-fix', help='Independent stacking-only repair for hidden labels; dry-run by default'))
     export = commands.add_parser('export')
     export.add_argument('source')
     export.add_argument('output')
@@ -677,6 +681,10 @@ def main():
     args = parser.parse_args()
     if args.command == 'native-check':
         return run_native_check(args)
+    if args.command == 'native-fix':
+        return run_native_fix(args)
+    if args.command == 'native-stack-fix':
+        return run_native_stack_fix(args)
     if args.command == 'validate':
         errors = Diagram.load(args.source).validate()
         print('\n'.join(errors) if errors else 'Structural validation passed')

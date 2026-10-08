@@ -89,3 +89,24 @@ python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.dra
 Use a new output directory. It contains `report.json`, `annotated.drawio` with a separate editable findings layer, and `page-1.png` (one PNG per checked page). Numbered red ovals match the severity, affected cell IDs, and explanation in the legend and JSON. All severities are highlighted by default; `--highlight warning` or `--highlight warning,advisory` filters the illustrations without hiding findings from the JSON or changing the failure threshold. Generation is fully scripted; deciding whether a finding needs a fix still requires review. The source diagram stays unchanged.
 
 The optional checker runs Draw.io's local JavaScript renderer in headless Chromium and returns JSON containing label IDs, measured bounds, and potential collisions with severity and reasons. Shape overlaps consider sampled paint order, fill transparency, and native label backgrounds. Warnings affect the default exit code; advisories remain available for review (`--fail-on advisory` enables a stricter threshold). It needs no Xvfb or third-party Python packages. See [native checking and fixes](references/native-check.md) for dependency paths, exit codes, limitations, and the fix-and-recheck workflow.
+
+For conservative automatic label fixes:
+
+```bash
+# Verified dry-run: JSON proposals, no diagram written
+python3 scripts/drawio_arch.py native-fix design.drawio
+
+# Apply to a new file and independently verify its native rendering
+python3 scripts/drawio_arch.py native-fix design.drawio --output design-fixed.drawio
+```
+
+The fixer changes only connection-label offsets. Text, styles, shapes, ports, routes, topology, and metadata are preserved and checked against the source. It uses bounded native-rendered candidates, including coupled label moves, and retains unresolved cases when a safe local move cannot be found. `--keep ID` freezes intentional placements; `--only ID` limits repairs. See [automatic repair](references/native-fix.md) for limits, receipts, and generator updates.
+
+For a label hidden behind an opaque shape, there is a **separate stacking-only fixer**:
+
+```bash
+python3 scripts/drawio_arch.py native-stack-fix design.drawio
+python3 scripts/drawio_arch.py native-stack-fix design.drawio --output design-stacked.drawio
+```
+
+Occlusion warnings suggest this command. It preserves every coordinate and style, changing only the owning edge's order relative to sibling cells. Native verification confirms the label is in front; conservative checks reject raising its line through shapes or over other text and overlapping connections. See [stacking repair](references/native-stack-fix.md) for supported cases and exit codes. Offset and stacking repairs are independent.

@@ -64,6 +64,16 @@ The package also includes `native-check`, which uses the installed Draw.io JavaS
 
 `native-check --report-dir <new-directory>` adds numbered findings layers, a JSON artifact manifest and native page PNGs. Report regressions cover source/cell preservation, negative coordinates, severity filtering independent of exit status, selected-page filenames, clean/incomplete results and failure cleanup. With the native-test browser configured and Draw.io Desktop export available, an additional integration test checks a filtered second-page report. The eight-shape, 24-connection experiment was also rendered through the CLI and visually inspected: five warnings, two advisories and one informational finding were correctly numbered and highlighted.
 
+### Conservative native repair
+
+The suite now has 34 tests, all executed successfully with the optional native renderer enabled. New repair tests cover exact offset-only XML preservation (rejecting text, style, terminal, waypoint, position and metadata changes), bounded coupled moves, HTML/child labels, locked labels and selected pages, deterministic dry-run/apply behavior and idempotence, connector barriers, unsupported routes, advisory-only input, candidate budgets, source changes, and failed fresh-render verification. The eight-shape experiment reduced five warnings to one using four label-offset changes; its two advisories and informational overlap were retained. The remaining hidden label could not be safely moved within the default 32-pixel limit. The corrected native PNG and automated findings report were visually inspected. These are specific regression results, not a claim of global optimality or semantic certification. See [repair scope and research](native-fix.md).
+
+### Independent stacking repair
+
+The suite now has 41 tests, all passing with the optional native renderer enabled. Stacking tests cover exact sibling-order-only XML preservation, metadata wrappers, immutable label/shape/route measurements, persistent dry-run/apply behavior, idempotence, warning suggestions, direct child labels, locks, selected pages, and refusal of line exposure, covering other text, crossing-order changes and cross-layer reordering. Geometry guards also cover collinear paths and overlapping stroke/marker bounds.
+
+Applied after offset repair in the eight-shape experiment, `native-stack-fix` raised the edge owning `CG-covered` above shape `C` without changing coordinates, text or styles. Native rechecking confirmed the label is now above the shape, leaving zero warnings, two advisories and two informational findings. The resulting PNG was visually inspected. These bounded checks do not certify diagram semantics or pixel-perfect appearance. See [stacking repair scope](native-stack-fix.md).
+
 ### Original examples
 
 From the skill directory:

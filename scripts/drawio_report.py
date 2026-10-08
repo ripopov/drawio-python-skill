@@ -76,6 +76,8 @@ def annotate(doc, report, severities):
             notes.append('{} [{}] {} / {}\n{}'.format(
                 number, finding['severity'].upper(), finding['a'], finding['b'],
                 finding['explanation']))
+            if finding.get('suggested_fix'):
+                notes[-1] += '\nSuggested: ' + finding['suggested_fix']['command'] + ' (dry-run)'
 
         left, _, right, bottom = _union(extents)
         width = max(600, min(1000, right - left))

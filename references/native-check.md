@@ -50,6 +50,10 @@ Highlights use the checker's measured coordinates; PNGs use the installed Deskto
 
 ## Read the report and fix
 
+For scripted, offset-only repair with native rechecking and preservation checks, use [native-fix](native-fix.md). It is optional and separate from this read-only checker; visual reports never apply fixes.
+
+An opaque foreground shape produces `possible-label-occlusion` with a `message` recommending [native-stack-fix](native-stack-fix.md), plus a machine-readable `suggested_fix` containing its command name, dry-run mode, and page/label arguments. Visual report legends include the recommendation. This is a suggestion to test a safe reorder, not proof that reordering is possible; the independent fixer can decline it with a reason.
+
 Each page reports:
 
 - `labels`: cell IDs, owning edge IDs, text, and measured bounds in diagram pixels at scale 1. Child labels keep their own cell IDs.

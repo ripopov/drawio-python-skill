@@ -1,6 +1,6 @@
 ---
 name: drawio-python-arch
-description: Generate and edit editable Draw.io diagrams with a bundled Python standard-library API. Use for SoC hardware architecture, microarchitecture, flowcharts, schemas, swimlanes, networks and native-shape illustrations. Includes deterministic connections, records, structural checks, optional PNG export and native label collision verification.
+description: Generate and edit editable Draw.io diagrams with a bundled Python standard-library API. Use for SoC hardware architecture, microarchitecture, flowcharts, schemas, swimlanes, networks and native-shape illustrations. Includes deterministic connections, records, structural checks, optional PNG export, native label collision verification and conservative label repair.
 ---
 
 # Draw.io with Python
@@ -72,6 +72,10 @@ python3 "$SKILL_DIR/scripts/drawio_arch.py" export /absolute/user/workspace/desi
 For dense diagrams, suspected label collisions, or requested in-depth verification, read [native checking and fixes](references/native-check.md). Run `python3 "$SKILL_DIR/scripts/drawio_arch.py" native-check /absolute/user/workspace/design.drawio` when its optional prerequisites are available. It reports measured overlaps by cell ID with severity and reasons, considering sampled paint order, fill opacity and label backgrounds. Review warnings, revise `label_offset`, label position/segment, or route spacing for unintended conflicts, and re-check affected pages. Do not automatically move readable labels for advisory/informational shape overlaps. Exit 0 can still include advisories; a failed renderer or unmeasured label is not a clean verification result. This check is read-only and does not replace visual inspection.
 
 For a visual findings report, add `--report-dir /absolute/user/workspace/design-report` (a new directory). This scripts the entire check, JSON report, editable findings layer, and numbered red-oval PNGs; do not write a custom annotation script. PNGs additionally require Draw.io Desktop, with `--headless` for Xvfb on headless Linux. Optional `--highlight warning,advisory` filters visual annotations while JSON and exit status still include all findings. Inspect or fix the source diagram, not the annotated report copy.
+
+For requested overlap fixes, use `native-fix design.drawio` for a verified dry-run or add `--output design-fixed.drawio` to produce a new file. Read [conservative automatic repair](references/native-fix.md) first. It adjusts only connection-label offsets, preserves text/styles/routes/topology, and rechecks the serialized output. Use `--keep ID` for intentionally placed labels or `--only ID` to narrow repairs. Its bounded search can leave warnings unresolved; do not automatically increase movement limits. Transfer accepted `changes` into the authoritative generator's `label_offset` (or child label `offset`) so regeneration retains the repairs. Visual review still checks meaning and label association.
+
+For `possible-label-occlusion` warnings, consider the separate `native-stack-fix design.drawio` first; the warning includes this suggestion. Read [stacking-only repair](references/native-stack-fix.md). It keeps label positions/styles fixed and tests a minimal reorder of the owning edge above a sibling shape. Use `--output design-stacked.drawio` to apply to a new file. Reordering also raises the line, so the fixer rejects unsafe crossings/obscuration and cross-layer cases. Neither fixer invokes the other.
 
 PNG export uses optional Draw.io Desktop. `--headless` also needs Xvfb; omit it with a working display. Use `--no-sandbox` only when the execution environment requires Electron's flag. Library `--page 0` means the first page. PNGs crop to content on the tested Desktop version.
 

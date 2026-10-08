@@ -156,6 +156,10 @@ def add_arguments(parser):
     parser.add_argument('--no-sandbox', action='store_true', help='Only where Chromium sandbox cannot run')
     parser.add_argument('--fail-on', choices=('warning', 'advisory'), default='warning',
                         help='Findings that cause exit 1 (default warning; advisory includes warnings)')
+    parser.add_argument('--report-dir', help='Create a new directory with JSON, annotated Draw.io and page PNGs')
+    parser.add_argument('--highlight', default='all', help='Visual filter: all or comma-separated warning,advisory,info')
+    parser.add_argument('--export-executable', default='drawio', help='Draw.io Desktop executable for report PNGs')
+    parser.add_argument('--headless', action='store_true', help='Use Xvfb for report PNG export')
     return parser
 
 
@@ -163,9 +167,22 @@ def run(args):
     options = vars(args).copy()
     options.pop('command', None)
     fail_on = options.pop('fail_on', 'warning')
+    report_dir = options.pop('report_dir', None)
+    highlight = options.pop('highlight', 'all')
+    executable = options.pop('export_executable', 'drawio')
+    headless = options.pop('headless', False)
     try:
+        from drawio_report import highlight_severities, write_visual_report
+        highlight_severities(highlight)
+        if report_dir and Path(report_dir).exists():
+            raise ValueError('Report directory already exists; choose a new directory: ' + str(report_dir))
         report = native_check(**options)
-    except (ValueError, RuntimeError, OSError, KeyError) as exc:
+        if report_dir:
+            report = write_visual_report(options['source'], report, report_dir, highlight=highlight,
+                                         executable=executable, headless=headless,
+                                         no_sandbox=options.get('no_sandbox', False),
+                                         timeout=options.get('timeout', 60))
+    except (ValueError, RuntimeError, OSError, KeyError, subprocess.TimeoutExpired) as exc:
         print(json.dumps({'error': str(exc)}, ensure_ascii=False))
         return 2
     print(json.dumps(report, indent=2, ensure_ascii=False))

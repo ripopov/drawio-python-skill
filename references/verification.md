@@ -60,6 +60,10 @@ The content-cropped PNG dimensions are 702×612 (4×4 mesh), 1382×1212 (8×8), 
 
 The package also includes `native-check`, which uses the installed Draw.io JavaScript renderer in headless Chromium. See [native checking and fixes](native-check.md) for its dependencies and limits. The original thirteen library tests still pass, alongside two browser-independent helper tests and four optional end-to-end native tests. Native tests were executed against the installed Draw.io assets and Chrome: an auto-routed HTML/plain/child-label collision was detected, native offsets cleared it, page selection and hidden-label exclusion passed, an obstacle collision was detected, and source bytes remained unchanged by checking. Additional fixtures verify foreground/background shape ordering, transparent/translucent fills, protected label backgrounds, clearance-only advisories and configurable CLI exit thresholds. These measurements do not constitute visual inspection or certify remote fonts, math typesetting, or diagram semantics.
 
+### Scripted visual reports
+
+`native-check --report-dir <new-directory>` adds numbered findings layers, a JSON artifact manifest and native page PNGs. Report regressions cover source/cell preservation, negative coordinates, severity filtering independent of exit status, selected-page filenames, clean/incomplete results and failure cleanup. With the native-test browser configured and Draw.io Desktop export available, an additional integration test checks a filtered second-page report. The eight-shape, 24-connection experiment was also rendered through the CLI and visually inspected: five warnings, two advisories and one informational finding were correctly numbered and highlighted.
+
 ### Original examples
 
 From the skill directory:

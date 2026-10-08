@@ -79,4 +79,13 @@ For deeper verification, check actual rendered label bounds without modifying th
 python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.drawio
 ```
 
+Generate a complete visual report in one command (also requires Draw.io Desktop, and Xvfb with `--headless`):
+
+```bash
+python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.drawio \
+  --report-dir /tmp/axi-visual-report --headless
+```
+
+Use a new output directory. It contains `report.json`, `annotated.drawio` with a separate editable findings layer, and `page-1.png` (one PNG per checked page). Numbered red ovals match the severity, affected cell IDs, and explanation in the legend and JSON. All severities are highlighted by default; `--highlight warning` or `--highlight warning,advisory` filters the illustrations without hiding findings from the JSON or changing the failure threshold. Generation is fully scripted; deciding whether a finding needs a fix still requires review. The source diagram stays unchanged.
+
 The optional checker runs Draw.io's local JavaScript renderer in headless Chromium and returns JSON containing label IDs, measured bounds, and potential collisions with severity and reasons. Shape overlaps consider sampled paint order, fill transparency, and native label backgrounds. Warnings affect the default exit code; advisories remain available for review (`--fail-on advisory` enables a stricter threshold). It needs no Xvfb or third-party Python packages. See [native checking and fixes](references/native-check.md) for dependency paths, exit codes, limitations, and the fix-and-recheck workflow.

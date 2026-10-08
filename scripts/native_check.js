@@ -164,6 +164,7 @@
             const summary = {warning: 0, advisory: 0, info: 0};
             for (const finding of collisions) summary[finding.severity]++;
             reports.push({index: input.index, name: input.name, labels, summary,
+                bounds: rect(graph.getGraphBounds()),
                 shapes: shapes.map(s => ({id: s.id, bounds: s.bounds})),
                 collisions, unmeasured_labels: unmeasured});
             graph.destroy();

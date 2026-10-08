@@ -25,12 +25,36 @@ python3 "$SKILL_DIR/scripts/drawio_arch.py" native-check /absolute/path/design.d
 
 Exit codes: **0** means no warnings or unmeasured visible labels at the selected threshold; **1** means warnings or incomplete label measurement need review; **2** means verification failed or a prerequisite is unavailable. Advisories and informational findings remain in the JSON even when the exit code is 0. Add `--fail-on advisory` to make advisories also cause exit 1. The JSON error on failure must not be treated as a successful check. The source file is never modified.
 
+## Generate a visual report
+
+```bash
+python3 "$SKILL_DIR/scripts/drawio_arch.py" native-check /absolute/path/design.drawio \
+  --report-dir /absolute/path/design-report --headless
+```
+
+One command performs the check and creates a complete report without agent-authored annotation code:
+
+- `report.json`: all measured findings, globally numbered across checked pages, with readable `explanation` text, `highlighted` flags and an artifact manifest.
+- `annotated.drawio`: a copy retaining all original pages and cells, plus a separate editable **Native check findings** layer on each checked page. Hide or delete this layer to remove annotations.
+- `page-1.png`, `page-2.png`, etc.: one native PNG per checked page. Filenames use the original one-based page number, so `--page 1` produces only `page-2.png` while the editable copy retains every page.
+
+Red ovals enclose the affected labels (including labels hidden behind shapes). Each number maps to a legend entry with severity, both cell IDs, and a readable explanation. A label-shape finding circles the label, not the entire shape. The legend sits below rendered content, including native routes. Pages with no findings still get a report image; unmeasured labels are explicitly marked **INCOMPLETE**, with their IDs, because they cannot be circled reliably.
+
+`--highlight all` is the default. Select exact severities with `--highlight warning`, `--highlight warning,advisory`, or `--highlight info`. Numbering stays consistent across filters; skipped numbers belong to excluded findings. Filtering affects only ovals and legend entries: JSON retains every finding, summary counts include every severity, and `--fail-on` controls exit status independently.
+
+Visual reports additionally require Draw.io Desktop (`--export-executable /path/to/drawio` when needed). Use `--headless` for Xvfb on headless Linux, or omit it with a working display. `--no-sandbox`, when required by the environment, applies to both Chromium and Desktop. The timeout applies separately to checking and each PNG export. JSON-only checks retain their existing requirements and behavior.
+
+The destination must be a **new directory**; choose a new name for each run. Artifacts are staged and the directory is published only after every page exports successfully. A missing renderer, failed export, or existing destination returns exit 2 without publishing a partial bundle or overwriting existing files. Exit 1 for detected warnings still produces the complete bundle. The source file is never modified. Run further checks and fixes on the source, since annotation text in the report copy is itself diagram content.
+
+Highlights use the checker's measured coordinates; PNGs use the installed Desktop exporter. Use matching local Draw.io assets and fonts for closest alignment. The report preserves the checker's limits and does not certify that each highlighted overlap is a defect.
+
 ## Read the report and fix
 
 Each page reports:
 
 - `labels`: cell IDs, owning edge IDs, text, and measured bounds in diagram pixels at scale 1. Child labels keep their own cell IDs.
 - `shapes`: vertex IDs and rectangular geometry bounds.
+- `bounds`: native rendered bounds for the page, used to place the visual legend below the diagram.
 - `collisions`: `label-label` or `label-shape`, the two IDs `a` and `b`, the intersection rectangle including requested clearance, plus `severity` and `reason`. At least one label belongs to an edge. Node-to-node label overlaps are outside this check's scope.
 - `summary`: counts of `warning`, `advisory`, and `info` findings per page.
 - `unmeasured_labels`: visible labels for which the renderer did not supply usable bounds. These prevent a clean result.
@@ -90,3 +114,5 @@ DRAWIO_NATIVE_TEST_BROWSER=/path/to/chromium \
 ```
 
 Optional environment variables: `DRAWIO_NATIVE_TEST_ASAR`, `DRAWIO_NATIVE_TEST_WEBAPP`, and `DRAWIO_NATIVE_TEST_NO_SANDBOX=1` where needed. The tests reproduce a collision on auto-routed HTML/plain/child labels, fix it via native offsets, verify multipage selection and hidden-label exclusion, detect a label over an obstacle, and verify source preservation. They also verify paint-order/transparency/background classifications and that clearance-only advisories leave the default CLI exit code at 0 while `--fail-on advisory` returns 1.
+
+Visual report tests cover preservation, filters, incomplete measurement and failed exports without requiring installed renderers. With `DRAWIO_NATIVE_TEST_BROWSER` set and Draw.io Desktop export available, the suite also generates an actual selected-page PNG report; headless Linux uses Xvfb.

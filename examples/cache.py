@@ -1,5 +1,8 @@
 """Dense SoC datapath: explicit signal names, computed endpoints and reserved lanes."""
 import argparse
+from pathlib import Path
+import tempfile
+
 from drawio_arch import Diagram, style, BLOCK, EDGE, TEXT
 
 
@@ -68,5 +71,5 @@ def build():
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',default='/tmp/l1-cache.drawio')
+    parser.add_argument('--output', default=Path(tempfile.gettempdir()) / 'l1-cache.drawio')
     print(build().save(parser.parse_args().output))

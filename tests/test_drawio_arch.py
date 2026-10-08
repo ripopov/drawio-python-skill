@@ -12,13 +12,107 @@ import xml.etree.ElementTree as ET
 import zlib
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'examples'))
-from drawio_arch import Diagram, style, export_png
+from drawio_arch import Diagram, style, export_png, _is_snap_executable, main
 import generate
 import detail
 import manufacturing
 import records
 import pools
 import cache
+
+
+class ExportTests(unittest.TestCase):
+    def render(self, cmd, **kwargs):
+        temporary = Path(cmd[cmd.index('--output') + 1])
+        source = Path(cmd[-1])
+        self.assertFalse(any(part.startswith('.') for part in temporary.relative_to(source.parent).parts))
+        temporary.write_bytes(b'\x89PNG\r\n\x1a\n' + b'\0' * 8 + struct.pack('>II', 100, 200))
+        return subprocess.CompletedProcess(cmd, 0, '', '')
+
+    def test_snap_launcher_and_resolved_binary_detection(self):
+        self.assertTrue(_is_snap_executable('/snap/bin/drawio'))
+        self.assertTrue(_is_snap_executable('/snap/drawio/305/app/drawio'))
+        self.assertFalse(_is_snap_executable('/opt/drawio/drawio'))
+        with tempfile.TemporaryDirectory() as directory:
+            launcher = Path(directory) / 'drawio'
+            launcher.symlink_to('/usr/bin/snap')
+            self.assertTrue(_is_snap_executable(launcher))
+            launcher.unlink()
+            launcher.symlink_to('/snap/drawio/305/app/drawio')
+            self.assertTrue(_is_snap_executable(launcher))
+
+    def test_snap_blocks_outside_hidden_and_symlink_paths_before_launch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home = root / 'home'
+            home.mkdir()
+            source = Diagram()
+            source.page().node('CPU', 0, 0)
+            allowed = source.save(home / 'source.drawio')
+            outside = source.save(root / 'source.drawio')
+            hidden = source.save(home / '.hidden/source.drawio')
+            link = home / 'linked.drawio'
+            link.symlink_to(outside)
+            escape = home / 'escape'
+            escape.symlink_to(root, target_is_directory=True)
+            cases = ((outside, home / 'out.png'), (allowed, root / 'out.png'),
+                     (allowed, root / 'home-other/out.png'), (hidden, home / 'out.png'),
+                     (allowed, home / '.out.png'), (link, home / 'out.png'),
+                     (allowed, escape / 'out.png'))
+            with patch('drawio_arch.Path.home', return_value=home), \
+                    patch('drawio_arch.shutil.which', return_value='/snap/bin/drawio'), \
+                    patch('drawio_arch.subprocess.run') as run:
+                for src, output in cases:
+                    with self.subTest(source=src, output=output):
+                        with self.assertRaisesRegex(RuntimeError, 'Snap Draw.io.*\\$HOME'):
+                            export_png(src, output, headless=True)
+                        self.assertFalse(output.exists())
+                run.assert_not_called()
+
+    def test_snap_visible_home_export_uses_accessible_temporary_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            doc = Diagram()
+            doc.page().node('CPU', 0, 0)
+            source = doc.save(home / 'source.drawio')
+            with patch('drawio_arch.Path.home', return_value=home), \
+                    patch('drawio_arch.shutil.which', return_value='/snap/bin/drawio'), \
+                    patch('drawio_arch.subprocess.run', side_effect=self.render) as run:
+                self.assertEqual(export_png(source, home / 'out.png', headless=True), (100, 200))
+            self.assertEqual(run.call_args.args[0][:2], ['xvfb-run', '-a'])
+            self.assertEqual(sorted(p.name for p in home.iterdir()), ['out.png', 'source.drawio'])
+
+    def test_export_surfaces_early_error_before_gpu_noise(self):
+        noise = '[ERROR:gl_display.cc:100] EGL Driver message: eglInitialize failed\n' * 100
+        cases = (('Error: input file/directory not found\n', noise, 'input file/directory not found'),
+                 ('', 'Error: permission denied\n' + noise, 'permission denied'),
+                 ('', 'Error: invalid rectangle\n' + noise, 'invalid rectangle'),
+                 ('', noise, 'No actionable renderer output'))
+        with tempfile.TemporaryDirectory() as directory:
+            doc = Diagram()
+            doc.page().node('CPU', 0, 0)
+            source = doc.save(Path(directory) / 'source.drawio')
+            output = Path(directory) / 'out.png'
+            output.write_bytes(b'previous PNG')
+            for stdout, stderr, expected in cases:
+                with self.subTest(expected=expected), \
+                        patch('drawio_arch.shutil.which', return_value='/opt/drawio/drawio'), \
+                        patch('drawio_arch.subprocess.run',
+                              return_value=subprocess.CompletedProcess([], 1, stdout, stderr)):
+                    with self.assertRaisesRegex(RuntimeError, expected) as failure:
+                        export_png(source, output)
+                    self.assertNotIn('EGL Driver', str(failure.exception))
+                    self.assertEqual(output.read_bytes(), b'previous PNG')
+
+    def test_export_accepts_native_asset_flags_for_compatibility(self):
+        for flag in ('--drawio-asar', '--drawio-webapp'):
+            with self.subTest(flag=flag), \
+                    patch('sys.argv', ['drawio_arch.py', 'export', 'source.drawio', 'out.png',
+                                       flag, '/unused/assets', '--executable', '/custom/drawio']), \
+                    patch('drawio_arch.export_png', return_value=(100, 200)) as export, \
+                    patch('builtins.print'):
+                self.assertEqual(main(), 0)
+                self.assertEqual(export.call_args.kwargs['executable'], '/custom/drawio')
 
 
 class DiagramTests(unittest.TestCase):

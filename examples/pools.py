@@ -1,5 +1,8 @@
 """BPMN-style pools with editable composite symbols; not BPMN execution semantics."""
 import argparse
+from pathlib import Path
+import tempfile
+
 from drawio_arch import Diagram, style, BLOCK, EDGE
 
 
@@ -63,5 +66,5 @@ def build():
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',default='/tmp/bpmn.drawio')
+    parser.add_argument('--output', default=Path(tempfile.gettempdir()) / 'bpmn.drawio')
     print(build().save(parser.parse_args().output))

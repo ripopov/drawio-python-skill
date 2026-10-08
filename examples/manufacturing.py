@@ -1,6 +1,8 @@
 """Outside return lanes and branch labels. Run with PYTHONPATH=skill/scripts."""
 import argparse
 from pathlib import Path
+import tempfile
+
 from drawio_arch import Diagram, style, BLOCK, EDGE
 
 
@@ -51,6 +53,6 @@ def build():
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',default='/tmp/manufacturing.drawio')
+    parser.add_argument('--output', default=Path(tempfile.gettempdir()) / 'manufacturing.drawio')
     args=parser.parse_args()
     print(build().save(Path(args.output)))

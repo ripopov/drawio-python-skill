@@ -623,17 +623,67 @@ class Diagram:
         return path
 
 
+def _is_snap_executable(executable):
+    """Recognize both Snap app binaries and symlinks to the Snap launcher."""
+    path = Path(executable).absolute()
+    resolved = path.resolve()
+    # /snap/bin/drawio commonly resolves to /usr/bin/snap, not the app binary.
+    return (str(path).startswith('/snap/') or str(resolved).startswith('/snap/')
+            or resolved.name == 'snap')
+
+
+def _check_snap_export_paths(source, output):
+    home = Path.home().resolve()
+    blocked = []
+    for label, path in (('source', source), ('output', output)):
+        try:
+            relative = path.relative_to(home)
+        except ValueError:
+            blocked.append(label + ' is outside $HOME: ' + str(path))
+        else:
+            if any(part.startswith('.') for part in relative.parts):
+                blocked.append(label + ' uses a hidden path: ' + str(path))
+    if blocked:
+        raise RuntimeError('Snap Draw.io cannot access these export paths: ' + '; '.join(blocked) + '. '
+                           f'Copy sources and keep outputs in a non-hidden directory under $HOME ({home}), '
+                           'such as $HOME/drawio-work. Snap has a private /tmp; '
+                           'host /tmp files are not accessible. Use the .deb installation for unconfined export.')
+
+
+def _export_failure(result):
+    """Keep the first useful error instead of a tail dominated by GPU logs."""
+    noise = ('egl driver message', 'egl_not_initialized', 'eglinitialize', 'libegl',
+             'angle display::initialize', 'angle platform', 'gl_display.cc',
+             'gl_surface_egl', 'gpu process exited', 'exiting gpu process',
+             'could not open the default x display')
+    lines = []
+    for line in (result.stdout + '\n' + result.stderr).splitlines():
+        line = line.strip()
+        if line and not any(marker in line.lower() for marker in noise):
+            lines.append(line)
+    for line in lines:
+        if any(marker in line.lower() for marker in ('error', 'failed', 'not found', 'denied')):
+            return line[:2000]
+    if lines:
+        return '\n'.join(lines)[:2000]
+    return (f'No actionable renderer output (exit code {result.returncode}); no PNG was produced. '
+            'Check source/output access and the display or --headless setup.')
+
+
 def export_png(source, output, *, page=0, scale=1, border=10, executable='drawio', headless=False, timeout=60, extra_args=()):
     """Native renderer; Draw.io Desktop is an optional external application."""
     if page < 0 or scale <= 0 or border < 0:
         raise ValueError('Invalid export options')
     source, output = Path(source).resolve(), Path(output).resolve()
+    renderer = shutil.which(executable)
+    if not renderer:
+        raise RuntimeError('Native PNG export requires Draw.io Desktop on PATH (generation does not)')
+    if _is_snap_executable(renderer):
+        _check_snap_export_paths(source, output)
     if page >= len(Diagram.load(source).pages):
         raise ValueError('Page index out of range')
     if source == output:
         raise ValueError('Export must not overwrite source')
-    if not shutil.which(executable):
-        raise RuntimeError('Native PNG export requires Draw.io Desktop on PATH (generation does not)')
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=str(output.parent)) as directory:
         temporary = Path(directory) / 'render.png'
@@ -645,7 +695,7 @@ def export_png(source, output, *, page=0, scale=1, border=10, executable='drawio
         env = dict(os.environ, DRAWIO_DISABLE_UPDATE='true')
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=env)
         if result.returncode or not temporary.exists():
-            raise RuntimeError('Native export failed: ' + result.stdout[-2000:] + result.stderr[-2000:])
+            raise RuntimeError('Native export failed: ' + _export_failure(result))
         data = temporary.read_bytes()
         if len(data) < 24 or data[:8] != b'\x89PNG\r\n\x1a\n':
             raise RuntimeError('Renderer did not produce PNG')
@@ -677,6 +727,10 @@ def main():
     export.add_argument('--border', type=int, default=10)
     export.add_argument('--headless', action='store_true')
     export.add_argument('--executable', default='drawio')
+    assets = export.add_mutually_exclusive_group()
+    for flag in ('--drawio-asar', '--drawio-webapp'):
+        assets.add_argument(flag, help='Accepted for CLI compatibility; PNG export uses '
+                            '--executable and ignores this asset path')
     export.add_argument('--no-sandbox', action='store_true', help='Pass Electron flag only where required by the environment')
     args = parser.parse_args()
     if args.command == 'native-check':

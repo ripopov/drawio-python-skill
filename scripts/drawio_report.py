@@ -130,7 +130,8 @@ def write_visual_report(source, report, destination, *, highlight='all', executa
     result = copy.deepcopy(report)
     annotate(doc, result, severities)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix='.drawio-report-', dir=destination.parent) as temporary:
+    # Snap's home interface cannot read hidden staging directories.
+    with tempfile.TemporaryDirectory(prefix='drawio-report-', dir=destination.parent) as temporary:
         stage = Path(temporary) / 'bundle'
         stage.mkdir()
         annotated = doc.save(stage / 'annotated.drawio')

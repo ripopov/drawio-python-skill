@@ -1,7 +1,8 @@
-"""Run: python3 generate.py --output-dir /tmp/drawio-demo [--rows 4 --cols 4]."""
+"""Run: python3 generate.py [--output-dir /path/to/output] [--rows 4 --cols 4]."""
 import argparse
 from pathlib import Path
 import sys
+import tempfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from drawio_arch import Diagram, style, BLOCK, EDGE, TEXT
 
@@ -139,7 +140,7 @@ def network():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output-dir', default='/tmp/drawio-demo')
+    parser.add_argument('--output-dir', default=Path(tempfile.gettempdir()) / 'drawio-demo')
     parser.add_argument('--rows',type=int,default=4)
     parser.add_argument('--cols',type=int,default=4)
     parser.add_argument('--width',type=int,default=128,help='Link width in bits')

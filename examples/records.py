@@ -1,5 +1,8 @@
 """Editable records work for schemas, register maps and interface inventories."""
 import argparse
+from pathlib import Path
+import tempfile
+
 from drawio_arch import Diagram, style, EDGE
 
 TABLES = {
@@ -34,5 +37,5 @@ def build():
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',default='/tmp/insurance-schema.drawio')
+    parser.add_argument('--output', default=Path(tempfile.gettempdir()) / 'insurance-schema.drawio')
     print(build().save(parser.parse_args().output))

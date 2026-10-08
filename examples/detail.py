@@ -1,6 +1,7 @@
 """Small example for layers, page links, containers and waypoints."""
-import sys
 from pathlib import Path
+import sys
+import tempfile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from drawio_arch import Diagram, style, EDGE
 
@@ -32,4 +33,5 @@ def build():
 
 
 if __name__ == '__main__':
-    print(build().save(sys.argv[1] if len(sys.argv)>1 else '/tmp/drawio-demo/detail.drawio'))
+    output = sys.argv[1] if len(sys.argv) > 1 else Path(tempfile.gettempdir()) / 'drawio-demo/detail.drawio'
+    print(build().save(output))

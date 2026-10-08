@@ -31,7 +31,7 @@ def regenerate(args):
                     no_sandbox=args.no_sandbox, timeout=args.timeout)
     exporter = dict(executable=args.export_executable, headless=args.headless,
                     no_sandbox=args.no_sandbox, timeout=args.timeout)
-    with tempfile.TemporaryDirectory(prefix='.native-label-example-', dir=destination) as directory:
+    with tempfile.TemporaryDirectory(prefix='native-label-example-', dir=destination) as directory:
         work = Path(directory)
         print('Checking and rendering the original diagram…', flush=True)
         before = native_check(source, **renderer)

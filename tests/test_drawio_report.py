@@ -5,6 +5,8 @@ import json
 import os
 from pathlib import Path
 import shutil
+import struct
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -18,6 +20,24 @@ from drawio_report import highlight_severities, write_visual_report
 
 
 class VisualReportTests(unittest.TestCase):
+    def test_snap_report_stages_in_visible_home_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            source, _, report = self.fixture(home)
+
+            def render(cmd, **kwargs):
+                Path(cmd[cmd.index('--output') + 1]).write_bytes(
+                    b'\x89PNG\r\n\x1a\n' + b'\0' * 8 + struct.pack('>II', 100, 200))
+                return subprocess.CompletedProcess(cmd, 0, '', '')
+
+            with patch('drawio_arch.Path.home', return_value=home), \
+                    patch('drawio_arch.shutil.which', return_value='/snap/bin/drawio'), \
+                    patch('drawio_arch.subprocess.run', side_effect=render):
+                result = write_visual_report(source, report, home / 'report', headless=True)
+            self.assertEqual(result['visual_report']['images'][0]['width'], 100)
+            self.assertTrue((home / 'report/page-2.png').exists())
+            self.assertEqual(sorted(p.name for p in home.iterdir()), ['report', 'source.drawio'])
+
     def fixture(self, directory):
         doc = Diagram()
         doc.page('Untouched').node('Original', 0, 0)

@@ -5,13 +5,66 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from drawio_arch import Diagram, EDGE, BLOCK, style
-from drawio_native import native_check
+from drawio_native import _find_asar, native_check
 
 
 class NativeCheckTests(unittest.TestCase):
+    def test_snap_discovery_prefers_current_and_falls_back_to_revision(self):
+        current = Path('/snap/drawio/current/app/resources/app.asar')
+        revision = Path('/snap/drawio/305/app/resources/app.asar')
+        for available, expected in (({current, revision}, current), ({revision}, revision)):
+            with self.subTest(available=available), \
+                    patch('drawio_native.shutil.which', return_value='/snap/bin/drawio'), \
+                    patch('drawio_native.Path.glob', return_value=[revision, current]), \
+                    patch('drawio_native.Path.is_file', lambda p: p in available):
+                self.assertEqual(_find_asar(), expected)
+
+    def test_asar_discovery_follows_deb_executable_symlink(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            binary = root / 'drawio'
+            binary.touch()
+            archive = root / 'resources/app.asar'
+            archive.parent.mkdir()
+            archive.touch()
+            launcher = root / 'launcher'
+            launcher.symlink_to(binary)
+            with patch('drawio_native.shutil.which', return_value=str(launcher)):
+                self.assertEqual(_find_asar(), archive)
+
+    def test_missing_asar_lists_tried_paths_and_recovery(self):
+        with patch('drawio_native.Path.is_file', return_value=False), \
+                patch('drawio_native.Path.glob', return_value=[]), \
+                patch('drawio_native.shutil.which', return_value=None):
+            with self.assertRaises(RuntimeError) as failure:
+                _find_asar()
+        message = str(failure.exception)
+        for text in ('/opt/drawio/resources/app.asar', '/snap/drawio/current/app/resources/app.asar',
+                     '/snap/drawio/*/app/resources/app.asar', '--drawio-asar', '--drawio-webapp',
+                     'find /snap /opt /usr -name app.asar'):
+            self.assertIn(text, message)
+
+    def test_explicit_missing_or_corrupt_asar_has_actionable_error(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'diagram.drawio'
+            doc = Diagram()
+            doc.page().node('CPU', 20, 20)
+            doc.save(path)
+            archive = Path(directory) / 'app.asar'
+            for corrupt in (False, True):
+                if corrupt:
+                    archive.write_bytes(b'bad header')
+                with self.subTest(corrupt=corrupt), \
+                        patch('drawio_native.shutil.which', return_value='/browser'):
+                    with self.assertRaises(RuntimeError) as failure:
+                        native_check(path, browser='/browser', asar=archive)
+                self.assertIn(str(archive), str(failure.exception))
+                self.assertIn('--drawio-asar', str(failure.exception))
+
     def test_missing_browser_is_explicit_and_source_is_preserved(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'diagram.drawio'

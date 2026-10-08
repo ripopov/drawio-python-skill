@@ -22,7 +22,7 @@ Reproduce both images and the fixed diagram from the original source:
 python3 docs/regenerate-native-label-check.py --headless
 ```
 
-The [script](docs/regenerate-native-label-check.py) runs stacking repair before offset repair. It replaces the generated artifacts in `docs` only after rendering succeeds; use `--output-dir /tmp/drawio-docs` for a separate destination. Exit 0 means no warnings or unmeasured labels remain, 1 means a verified partial result was generated, and 2 means generation failed.
+The [script](docs/regenerate-native-label-check.py) runs stacking repair before offset repair. It replaces the generated artifacts in `docs` only after rendering succeeds; use `--output-dir "$HOME/drawio-docs"` for a separate destination. Exit 0 means no warnings or unmeasured labels remain, 1 means a verified partial result was generated, and 2 means generation failed.
 
 ## Install and use
 
@@ -64,14 +64,24 @@ sudo apt install -y python3 git curl ca-certificates xvfb xauth fonts-liberation
 sudo snap install drawio
 
 # Chrome
-drawio_deps_dir="$(mktemp -d /tmp/drawio-deps.XXXXXX)"
+drawio_deps_dir="$(mktemp -d -t drawio-deps.XXXXXX)"
 chmod 755 "$drawio_deps_dir"
 curl -fL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
   -o "$drawio_deps_dir/google-chrome.deb"
 sudo apt install -y "$drawio_deps_dir/google-chrome.deb"
 ```
 
-For Snap, add `--drawio-asar /snap/drawio/current/resources/app.asar` to native checks, fixers and the documentation script. Snap PNG export is unverified; confinement may block temporary or hidden paths used by reports.
+Snap assets are auto-detected at `/snap/drawio/current/app/resources/app.asar`; use `--drawio-asar /snap/drawio/current/app/resources/app.asar` to override this for native checks, fixers and the documentation script.
+
+For Snap PNG export, keep sources, outputs and working copies in non-hidden directories under `$HOME`, including report directories. Snap cannot access host `/tmp` files. This workflow was reported verified on Ubuntu AMD64, Draw.io rev 305 (31.7.0), Chrome, Xvfb and Python 3.12:
+
+```bash
+python3 examples/generate.py --output-dir "$HOME/drawio-demo"
+python3 scripts/drawio_arch.py export "$HOME/drawio-demo/axi_test_system.drawio" \
+  "$HOME/drawio-demo/axi_test_system.png" --headless
+```
+
+For documentation renders, use `--output-dir "$HOME/drawio-docs"`. For unconfined exports from `/tmp` or hidden paths, install the AMD64 `.deb` from the [official releases](https://github.com/jgraph/drawio-desktop/releases) and select it with `--executable /opt/drawio/drawio` (`--export-executable` for reports and the documentation script).
 
 ## Package contents
 
@@ -91,28 +101,29 @@ Read [SKILL.md](SKILL.md) for the agent workflow and the [API reference](docs/ap
 From the repository root:
 
 ```bash
-python3 examples/generate.py --output-dir /tmp/drawio-demo
-python3 scripts/drawio_arch.py inspect /tmp/drawio-demo/axi_test_system.drawio
+drawio_demo_dir="$(mktemp -d -t drawio-demo.XXXXXX)"
+python3 examples/generate.py --output-dir "$drawio_demo_dir"
+python3 scripts/drawio_arch.py inspect "$drawio_demo_dir/axi_test_system.drawio"
 python3 -m unittest discover -s tests -v
 ```
 
 Export a PNG:
 
 ```bash
-python3 scripts/drawio_arch.py export /tmp/drawio-demo/axi_test_system.drawio /tmp/drawio-demo/axi_test_system.png --headless
+python3 scripts/drawio_arch.py export "$drawio_demo_dir/axi_test_system.drawio" "$drawio_demo_dir/axi_test_system.png" --headless
 ```
 
 Get a native check as JSON:
 
 ```bash
-python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.drawio
+python3 scripts/drawio_arch.py native-check "$drawio_demo_dir/axi_test_system.drawio"
 ```
 
 Add a visual report:
 
 ```bash
-python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.drawio \
-  --report-dir /tmp/axi-visual-report --headless
+python3 scripts/drawio_arch.py native-check "$drawio_demo_dir/axi_test_system.drawio" \
+  --report-dir "$drawio_demo_dir/visual-report" --headless
 ```
 
 Use a new output directory. It contains `report.json`, `annotated.drawio` with a separate editable findings layer, and one PNG per checked page. JSON includes label IDs, bounds, reasons and `highlight_color`. All severities are highlighted by default; `--highlight warning` or `--highlight warning,advisory` filters the illustrations without hiding findings from JSON or changing the failure threshold.

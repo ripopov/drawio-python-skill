@@ -48,15 +48,32 @@ def _webapp_from_asar(archive, destination):
     return destination
 
 
-def _find_asar():
+def _asar_candidates():
     candidates = [Path('/opt/drawio/resources/app.asar'),
+                  Path('/snap/drawio/current/app/resources/app.asar'),
                   Path('/Applications/draw.io.app/Contents/Resources/app.asar')]
+    candidates.extend(sorted(Path('/snap/drawio').glob('*/app/resources/app.asar'), reverse=True))
     if os.environ.get('LOCALAPPDATA'):
         candidates.append(Path(os.environ['LOCALAPPDATA']) / 'Programs/draw.io/resources/app.asar')
     executable = shutil.which('drawio')
     if executable:
         candidates.insert(0, Path(executable).resolve().parent / 'resources/app.asar')
-    return next((p for p in candidates if p.is_file()), None)
+    return list(dict.fromkeys(candidates))
+
+
+def _find_asar(archive=None):
+    candidates = [Path(archive).expanduser()] if archive is not None else _asar_candidates()
+    found = next((p for p in candidates if p.is_file()), None)
+    if found is None:
+        tried = ', '.join(str(p) for p in candidates)
+        if archive is None:
+            tried += ', /snap/drawio/*/app/resources/app.asar'
+        raise RuntimeError(f'Draw.io ASAR not found. Tried: {tried}. '
+                           'Install Draw.io Desktop or pass --drawio-asar /path/to/app.asar '
+                           '(or --drawio-webapp /path/to/src/main/webapp). '
+                           'On Linux, locate it with: find /snap /opt /usr -name app.asar 2>/dev/null; '
+                           'Snap normally uses /snap/drawio/current/app/resources/app.asar.')
+    return found
 
 
 class _ResultParser(HTMLParser):
@@ -98,12 +115,18 @@ def native_check(source, *, page=None, browser=None, webapp=None, asar=None,
     if not browser or not shutil.which(str(browser)):
         raise RuntimeError('Native checking requires Chromium/Chrome; use --browser /path/to/browser')
     if not webapp:
-        asar = asar or _find_asar()
-        if not asar:
-            raise RuntimeError('Native checking requires installed Draw.io assets; use --drawio-asar or --drawio-webapp')
+        asar = _find_asar(asar)
     with tempfile.TemporaryDirectory(prefix='drawio-native-check-') as directory:
         temporary = Path(directory)
-        assets = Path(webapp).resolve() if webapp else _webapp_from_asar(asar, temporary / 'webapp')
+        if webapp:
+            assets = Path(webapp).resolve()
+        else:
+            try:
+                assets = _webapp_from_asar(asar, temporary / 'webapp')
+            except (OSError, RuntimeError, ValueError, KeyError) as exc:
+                raise RuntimeError(f'Cannot extract Draw.io renderer assets from {asar}: {exc}. '
+                                   'Use --drawio-asar with a readable Draw.io app.asar '
+                                   'or --drawio-webapp with an extracted src/main/webapp directory.') from exc
         for name in ('js/app.min.js', 'js/export-init.js', 'js/stencils.min.js', 'js/shapes-14-6-5.min.js'):
             if not (assets / name).is_file():
                 raise RuntimeError('Draw.io renderer asset missing: ' + name)

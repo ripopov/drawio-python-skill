@@ -6,7 +6,23 @@ The bundled API uses only the Python standard library. It provides shapes, ports
 
 ## Install and use
 
-The skill lives at [`.agents/skills/drawio-python-arch`](.agents/skills/drawio-python-arch/SKILL.md). Use this repository as a workspace with an agent that discovers `.agents/skills/`, or copy the entire `drawio-python-arch` directory into your agent's supported skills directory. Keep its scripts, references, and examples together.
+The repository root is the complete skill package. Install it directly into your agent's skills directory, using `drawio-python-arch` as the local directory name to match the skill metadata:
+
+```bash
+mkdir -p "$HOME/.agents/skills"
+git clone https://github.com/ripopov/drawio-python-skill.git \
+  "$HOME/.agents/skills/drawio-python-arch"
+```
+
+For other agents, use their supported skills directory. Keep the whole repository together so scripts, references, and examples remain available.
+
+Update an installed clone with:
+
+```bash
+git -C "$HOME/.agents/skills/drawio-python-arch" pull --ff-only
+```
+
+Run that command before starting your agent, or schedule it on each machine for automatic updates.
 
 Ask your agent to use `drawio-python-arch`, for example:
 
@@ -23,7 +39,7 @@ The output `.drawio` files can be opened and edited in Draw.io Desktop or diagra
 ## Package contents
 
 ```text
-.agents/skills/drawio-python-arch/
+drawio-python-arch/
 ├── SKILL.md       # Agent instructions and standard YAML metadata
 ├── scripts/       # Self-contained Python API and CLI
 ├── references/    # API documentation and verification notes
@@ -31,22 +47,22 @@ The output `.drawio` files can be opened and edited in Draw.io Desktop or diagra
 └── tests/         # Standard-library unittest suite
 ```
 
-Read [SKILL.md](.agents/skills/drawio-python-arch/SKILL.md) for the agent workflow and the [API reference](.agents/skills/drawio-python-arch/references/api.md) for direct Python use.
+Read [SKILL.md](SKILL.md) for the agent workflow and the [API reference](references/api.md) for direct Python use.
 
 ## Run examples and checks
 
 From the repository root:
 
 ```bash
-python3 .agents/skills/drawio-python-arch/examples/generate.py --output-dir /tmp/drawio-demo
-python3 .agents/skills/drawio-python-arch/scripts/drawio_arch.py inspect /tmp/drawio-demo/axi_test_system.drawio
-python3 -m unittest discover -s .agents/skills/drawio-python-arch/tests -v
+python3 examples/generate.py --output-dir /tmp/drawio-demo
+python3 scripts/drawio_arch.py inspect /tmp/drawio-demo/axi_test_system.drawio
+python3 -m unittest discover -s tests -v
 ```
 
 For optional native rendering:
 
 ```bash
-python3 .agents/skills/drawio-python-arch/scripts/drawio_arch.py export /tmp/drawio-demo/axi_test_system.drawio /tmp/drawio-demo/axi_test_system.png --headless
+python3 scripts/drawio_arch.py export /tmp/drawio-demo/axi_test_system.drawio /tmp/drawio-demo/axi_test_system.png --headless
 ```
 
-Omit `--headless` when a display is available. Structural checks do not replace visual inspection; see the [verification notes](.agents/skills/drawio-python-arch/references/verification.md) for supported features and limits.
+Omit `--headless` when a display is available. Structural checks do not replace visual inspection; see the [verification notes](references/verification.md) for supported features and limits.

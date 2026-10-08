@@ -174,4 +174,4 @@ CLI equivalent:
 python3 "$SKILL_DIR/scripts/drawio_arch.py" export input.drawio output.png --page 1 --scale 1.5 --headless
 ```
 
-`extra_args` can pass supported native exporter options such as `--embed-diagram` or `--transparent`. Check the installed Desktop's `--help`; capabilities differ between versions. Native image export crops to diagram bounds on the tested version; page width/height in XML remain the editable canvas size. Multi-page files require a separate PNG export per page. Never describe a cropped PNG as exact page-sized output.
+`extra_args` can pass supported native exporter options such as `--embed-diagram` or `--transparent`. Check the installed Desktop's `--help`; capabilities differ between versions. PNGs can crop to diagram bounds; page width/height in XML remain the editable canvas size. Multi-page files require a separate PNG export per page. Never describe a cropped PNG as exact page-sized output.

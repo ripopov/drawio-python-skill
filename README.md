@@ -34,7 +34,7 @@ git clone https://github.com/ripopov/drawio-python-skill.git \
   "$HOME/.agents/skills/drawio-python-arch"
 ```
 
-For other agents, use their supported skills directory. Keep the whole repository together so scripts, references, and examples remain available.
+For other agents, use their supported skills directory. Keep the whole repository together so scripts, documentation, and examples remain available.
 
 Update an installed clone with:
 
@@ -79,13 +79,12 @@ For Snap, add `--drawio-asar /snap/drawio/current/resources/app.asar` to native 
 drawio-python-arch/
 ├── SKILL.md       # Agent instructions and standard YAML metadata
 ├── scripts/       # Self-contained Python API and CLI
-├── references/    # API documentation and verification notes
 ├── examples/      # Generators, prompts, editable diagrams, and previews
-├── docs/          # Before/after diagrams, illustrations and regeneration script
+├── docs/          # API guides, verification, before/after diagrams and regeneration script
 └── tests/         # Standard-library unittest suite
 ```
 
-Read [SKILL.md](SKILL.md) for the agent workflow and the [API reference](references/api.md) for direct Python use.
+Read [SKILL.md](SKILL.md) for the agent workflow and the [API reference](docs/api.md) for direct Python use.
 
 ## Run examples and checks
 
@@ -118,7 +117,7 @@ python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.dra
 
 Use a new output directory. It contains `report.json`, `annotated.drawio` with a separate editable findings layer, and one PNG per checked page. JSON includes label IDs, bounds, reasons and `highlight_color`. All severities are highlighted by default; `--highlight warning` or `--highlight warning,advisory` filters the illustrations without hiding findings from JSON or changing the failure threshold.
 
-Warnings affect the default checker exit code; `--fail-on advisory` enables a stricter threshold. See [native checking](references/native-check.md) for collision rules and exit codes, and [verification notes](references/verification.md) for tested features and limits.
+Warnings affect the default checker exit code; `--fail-on advisory` enables a stricter threshold. See [native checking](docs/native-check.md) for collision rules and exit codes, and [verification scope](docs/verification.md) for check coverage and development commands.
 
 Run either fixer without `--output` for a verified dry-run, or save to a new file:
 
@@ -130,4 +129,4 @@ python3 scripts/drawio_arch.py native-fix design.drawio --output design-fixed.dr
 python3 scripts/drawio_arch.py native-stack-fix design.drawio --output design-stacked.drawio
 ```
 
-Checks and fixers leave the source unchanged. Use `--keep ID` to protect cells and `--only ID` to select labels for repair. See [offset repair](references/native-fix.md) and [stacking repair](references/native-stack-fix.md) for safety checks, supported cases, receipts and generator updates.
+Checks and fixers leave the source unchanged. Use `--keep ID` to protect cells and `--only ID` to select labels for repair. See [offset repair](docs/native-fix.md) and [stacking repair](docs/native-stack-fix.md) for safety checks, supported cases, receipts and generator updates.

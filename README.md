@@ -4,6 +4,10 @@ A self-contained [Agent Skills](https://agentskills.io/specification) package fo
 
 The bundled API uses only the Python standard library. It provides shapes, ports, containers, layers, multiple pages, deterministic connectors, tables, metadata, structural validation, and targeted edits to existing diagrams.
 
+![Draw.io diagram with eight shapes and 24 labeled connections, with native checker findings highlighted in numbered red ovals](docs/native-label-check.png)
+
+Native verification example: red ovals mark five warnings, two advisories, and one informational overlap. The diagram intentionally contains defects to illustrate what the checker detects.
+
 ## Install and use
 
 The repository root is the complete skill package. Install it directly into your agent's skills directory, using `drawio-python-arch` as the local directory name to match the skill metadata:
@@ -45,6 +49,7 @@ drawio-python-arch/
 ├── scripts/       # Self-contained Python API and CLI
 ├── references/    # API documentation and verification notes
 ├── examples/      # Generators, prompts, editable diagrams, and previews
+├── docs/          # README illustrations
 └── tests/         # Standard-library unittest suite
 ```
 

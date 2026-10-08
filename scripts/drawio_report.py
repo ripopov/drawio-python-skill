@@ -10,6 +10,7 @@ from drawio_arch import Diagram, TEXT, export_png, style
 
 
 SEVERITIES = ('warning', 'advisory', 'info')
+SEVERITY_COLORS = {'warning': '#dc2626', 'advisory': '#b45309', 'info': '#2563eb'}
 REASONS = {
     'overlapping-label-bounds': 'Label bounds overlap',
     'insufficient-clearance': 'Less than the requested clearance',
@@ -56,6 +57,8 @@ def annotate(doc, report, severities):
             finding['highlighted'] = finding['severity'] in severities
             if not finding['highlighted']:
                 continue
+            color = SEVERITY_COLORS[finding['severity']]
+            finding['highlight_color'] = color
             boxes = [labels[finding['a']]['bounds']]
             if finding['type'] == 'label-label':
                 boxes.append(labels[finding['b']]['bounds'])
@@ -67,10 +70,10 @@ def annotate(doc, report, severities):
             width, height = right - left + 2 * padx, bottom - top + 2 * pady
             oval = page.node('', x, y, width, height, parent=layer,
                              style=style(shape='ellipse', fillColor='none',
-                                         strokeColor='#dc2626', strokeWidth=3))
+                                         strokeColor=color, strokeWidth=3))
             badge = page.text(str(number), x + width, y - 12, 48, 26, parent=layer,
                               style=style(TEXT, fontSize=16, fontStyle=1,
-                                          fontColor='#dc2626', labelBackgroundColor='#ffffff'))
+                                          fontColor=color, labelBackgroundColor='#ffffff'))
             finding['annotation_cells'] = [oval, badge]
             extents.append({'x': x, 'y': y - 12, 'width': width + 48, 'height': height + 12})
             notes.append('{} [{}] {} / {}\n{}'.format(
@@ -78,12 +81,13 @@ def annotate(doc, report, severities):
                 finding['explanation']))
             if finding.get('suggested_fix'):
                 notes[-1] += '\nSuggested: ' + finding['suggested_fix']['command'] + ' (dry-run)'
+            notes[-1] = (notes[-1], color)
 
         left, _, right, bottom = _union(extents)
         width = max(600, min(1000, right - left))
         y = bottom + 40
 
-        def note(text, size=14, bold=False):
+        def note(text, size=14, bold=False, color='#0f172a'):
             nonlocal y
             # Use explicit wrapping and generous line height for a readable native legend.
             columns = max(20, int((width - 24) / size))
@@ -94,20 +98,20 @@ def annotate(doc, report, severities):
             page.text('\n'.join(lines), left, y, width, height, parent=layer,
                       style=style(TEXT, fontSize=size, fontStyle=int(bold), align='left',
                                   verticalAlign='top', whiteSpace='nowrap',
-                                  fontColor='#0f172a', fillColor='#ffffff', spacing=6))
+                                  fontColor=color, fillColor='#ffffff', spacing=6))
             y += height + 6
 
         note('Native label check: ' + (result.get('name') or 'Untitled page'), 20, True)
         summary = result['summary']
         note('{} warnings | {} advisories | {} informational findings'.format(
             *(summary[s] for s in SEVERITIES)))
-        note('Highlighted: {}. Red ovals mark potential issues, not confirmed defects.'.format(
-            ', '.join(severities)))
+        note('Highlighted: {}. Warning = red; advisory = amber; info = blue. '
+             'Ovals mark potential issues, not confirmed defects.'.format(', '.join(severities)))
         if not notes:
             note('No findings match the highlight filter.' if result['collisions']
                  else 'No label collisions detected within the native checker scope.')
-        for entry in notes:
-            note(entry)
+        for entry, color in notes:
+            note(entry, color=color)
         if result['unmeasured_labels']:
             note('INCOMPLETE: visible labels could not be measured: ' +
                  ', '.join(label['id'] for label in result['unmeasured_labels']), bold=True)

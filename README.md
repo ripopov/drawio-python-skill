@@ -4,9 +4,23 @@ A self-contained [Agent Skills](https://agentskills.io/specification) package fo
 
 The bundled API uses only the Python standard library. It provides shapes, ports, containers, layers, multiple pages, deterministic connectors, tables, metadata, structural validation, and targeted edits to existing diagrams.
 
-![Draw.io diagram with eight shapes and 24 labeled connections, with native checker findings highlighted in numbered red ovals](docs/native-label-check.png)
+![Diagram before repair: eight shapes and 24 labeled connections, with warnings in red, advisories in amber and info in blue](docs/native-label-check.png)
 
-Native verification example: red ovals mark five warnings, two advisories, and one informational overlap. The diagram intentionally contains defects to illustrate what the checker detects.
+The [original editable diagram](docs/native-label-check.drawio) intentionally contains defects: five warnings, two advisories and one informational overlap. **Red = warning, amber = advisory, blue = info.** Numbered ovals match the severity and explanation in the legend.
+
+![Diagram after automatic stacking and label-offset repairs, with remaining advisory and informational findings highlighted](docs/native-label-check-fixed.png)
+
+The [fixed editable diagram](docs/native-label-check-fixed.drawio) has zero warnings, two advisories and two informational findings. The fixers separate overlapping labels and reveal the hidden label while preserving text, styles, shapes, routes and connections. The remaining overlaps stay visible for review; an oval does not necessarily indicate a defect.
+
+Reproduce both images and the fixed diagram from the original source:
+
+```bash
+python3 docs/regenerate-native-label-check.py --headless
+```
+
+The [script](docs/regenerate-native-label-check.py) checks and renders the original, runs the independent stacking fixer followed by the offset fixer, then checks and renders the saved result. It requires Chromium/Chrome, local Draw.io assets and Draw.io Desktop (plus Xvfb for `--headless`). Omit `--headless` when a display is available; add `--no-sandbox` only where the browser sandbox cannot run. Use `--help` for explicit renderer paths.
+
+Rerunning replaces the two PNGs and `native-label-check-fixed.drawio` in `docs` after rendering succeeds, leaving the source unchanged. Use `--output-dir /tmp/drawio-docs` for a separate destination. Exit 0 means no warnings or unmeasured labels remain, 1 means a verified partial result was generated, and 2 means generation failed.
 
 ## Install and use
 
@@ -49,7 +63,7 @@ drawio-python-arch/
 ├── scripts/       # Self-contained Python API and CLI
 ├── references/    # API documentation and verification notes
 ├── examples/      # Generators, prompts, editable diagrams, and previews
-├── docs/          # README illustrations
+├── docs/          # Before/after diagrams, illustrations and regeneration script
 └── tests/         # Standard-library unittest suite
 ```
 
@@ -86,7 +100,7 @@ python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.dra
   --report-dir /tmp/axi-visual-report --headless
 ```
 
-Use a new output directory. It contains `report.json`, `annotated.drawio` with a separate editable findings layer, and `page-1.png` (one PNG per checked page). Numbered red ovals match the severity, affected cell IDs, and explanation in the legend and JSON. All severities are highlighted by default; `--highlight warning` or `--highlight warning,advisory` filters the illustrations without hiding findings from the JSON or changing the failure threshold. Generation is fully scripted; deciding whether a finding needs a fix still requires review. The source diagram stays unchanged.
+Use a new output directory. It contains `report.json`, `annotated.drawio` with a separate editable findings layer, and `page-1.png` (one PNG per checked page). Numbered ovals use red for warnings, amber for advisories and blue for info, matching the legend entries and JSON `highlight_color`. All severities are highlighted by default; `--highlight warning` or `--highlight warning,advisory` filters the illustrations without hiding findings from the JSON or changing the failure threshold. Generation is fully scripted; deciding whether a finding needs a fix still requires review. The source diagram stays unchanged.
 
 The optional checker runs Draw.io's local JavaScript renderer in headless Chromium and returns JSON containing label IDs, measured bounds, and potential collisions with severity and reasons. Shape overlaps consider sampled paint order, fill transparency, and native label backgrounds. Warnings affect the default exit code; advisories remain available for review (`--fail-on advisory` enables a stricter threshold). It needs no Xvfb or third-party Python packages. See [native checking and fixes](references/native-check.md) for dependency paths, exit codes, limitations, and the fix-and-recheck workflow.
 

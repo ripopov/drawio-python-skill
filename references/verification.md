@@ -74,6 +74,8 @@ The suite now has 41 tests, all passing with the optional native renderer enable
 
 Applied after offset repair in the eight-shape experiment, `native-stack-fix` raised the edge owning `CG-covered` above shape `C` without changing coordinates, text or styles. Native rechecking confirmed the label is now above the shape, leaving zero warnings, two advisories and two informational findings. The resulting PNG was visually inspected. These bounded checks do not certify diagram semantics or pixel-perfect appearance. See [stacking repair scope](native-stack-fix.md).
 
+The reproducible documentation example now lives in `docs/native-label-check.drawio`. Running `python3 docs/regenerate-native-label-check.py --headless` checks and renders it, applies stacking repair then offset repair, and creates the fixed editable diagram and before/after PNGs. This order also produced zero warnings, two advisories and two informational findings. Both PNGs were visually inspected. Report regression checks verify that all three severities have distinct colors and that persisted ovals, badges, legend entries and JSON agree.
+
 ### Original examples
 
 From the skill directory:

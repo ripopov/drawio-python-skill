@@ -12,7 +12,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from drawio_arch import Diagram
+from drawio_arch import Diagram, _styles
 from drawio_native import add_arguments, native_check, run
 from drawio_report import highlight_severities, write_visual_report
 
@@ -91,6 +91,20 @@ class VisualReportTests(unittest.TestCase):
             self.assertIn('INCOMPLETE', text)
             self.assertIn('missing', text)
             self.assertIn('No label collisions detected', text)
+            # Check the persisted ovals, badges and legend agree for all severities.
+            page = doc.pages[1]
+            colors = set()
+            for finding in result['pages'][1]['collisions']:
+                oval, badge = (page.cell(ident) for ident in finding['annotation_cells'])
+                color = _styles(oval.get('style'))['strokeColor']
+                colors.add(color)
+                self.assertEqual(_styles(badge.get('style'))['fontColor'], color)
+                self.assertEqual(finding['highlight_color'], color)
+                legend = next(cell for ident, cell in page.cells().items()
+                              if page.label(ident).startswith('{} [{}]'.format(
+                                  finding['number'], finding['severity'].upper())))
+                self.assertEqual(_styles(legend.get('style'))['fontColor'], color)
+            self.assertEqual(len(colors), 3)
 
     def test_failure_and_existing_destination_preserve_files(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -33,6 +33,7 @@ Requirements:
 - Python 3.9 or later for generation, editing, and structural checks. No pip installation is needed.
 - Draw.io Desktop for optional PNG export.
 - Xvfb for optional headless PNG export on Linux.
+- Chromium/Chrome plus local Draw.io assets for optional native label collision checking.
 
 The output `.drawio` files can be opened and edited in Draw.io Desktop or diagrams.net. Connector routing is explicit; the library does not automatically avoid obstacles or measure text.
 
@@ -66,3 +67,11 @@ python3 scripts/drawio_arch.py export /tmp/drawio-demo/axi_test_system.drawio /t
 ```
 
 Omit `--headless` when a display is available. Structural checks do not replace visual inspection; see the [verification notes](references/verification.md) for supported features and limits.
+
+For deeper verification, check actual rendered label bounds without modifying the diagram:
+
+```bash
+python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.drawio
+```
+
+The optional checker runs Draw.io's local JavaScript renderer in headless Chromium and returns JSON containing label IDs, measured bounds, and potential collisions with severity and reasons. Shape overlaps consider sampled paint order, fill transparency, and native label backgrounds. Warnings affect the default exit code; advisories remain available for review (`--fail-on advisory` enables a stricter threshold). It needs no Xvfb or third-party Python packages. See [native checking and fixes](references/native-check.md) for dependency paths, exit codes, limitations, and the fix-and-recheck workflow.

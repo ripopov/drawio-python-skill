@@ -1,5 +1,7 @@
 # Python API
 
+Optional rendered collision verification is available through `from drawio_native import native_check` or the `native-check` CLI command. See [native checking and fixes](native-check.md) for its dependencies, report schema and usage. Ordinary generation/editing remains independent of the browser.
+
 Import `Diagram`, `style`, `BLOCK`, `EDGE`, `TEXT`, `export_png` from `drawio_arch` by putting this skill's `scripts` directory on `PYTHONPATH`. All parameters after `*` are keyword-only. IDs are strings scoped to one page. Returned IDs are the handles for later operations. No third-party Python modules are imported.
 
 ## Document and page

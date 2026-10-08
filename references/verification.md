@@ -56,6 +56,12 @@ The content-cropped PNG dimensions are 702×612 (4×4 mesh), 1382×1212 (8×8), 
 
 ## Reproduce
 
+### Optional native collision checker
+
+The package also includes `native-check`, which uses the installed Draw.io JavaScript renderer in headless Chromium. See [native checking and fixes](native-check.md) for its dependencies and limits. The original thirteen library tests still pass, alongside two browser-independent helper tests and four optional end-to-end native tests. Native tests were executed against the installed Draw.io assets and Chrome: an auto-routed HTML/plain/child-label collision was detected, native offsets cleared it, page selection and hidden-label exclusion passed, an obstacle collision was detected, and source bytes remained unchanged by checking. Additional fixtures verify foreground/background shape ordering, transparent/translucent fills, protected label backgrounds, clearance-only advisories and configurable CLI exit thresholds. These measurements do not constitute visual inspection or certify remote fonts, math typesetting, or diagram semantics.
+
+### Original examples
+
 From the skill directory:
 
 ```bash

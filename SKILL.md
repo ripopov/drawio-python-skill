@@ -1,6 +1,6 @@
 ---
 name: drawio-python-arch
-description: Generate and edit editable Draw.io diagrams with a bundled Python standard-library API. Use for SoC hardware architecture, microarchitecture, flowcharts, schemas, swimlanes, networks and native-shape illustrations. Includes deterministic connections, records, structural checks and optional native PNG export.
+description: Generate and edit editable Draw.io diagrams with a bundled Python standard-library API. Use for SoC hardware architecture, microarchitecture, flowcharts, schemas, swimlanes, networks and native-shape illustrations. Includes deterministic connections, records, structural checks, optional PNG export and native label collision verification.
 ---
 
 # Draw.io with Python
@@ -8,6 +8,8 @@ description: Generate and edit editable Draw.io diagrams with a bundled Python s
 Use `scripts/drawio_arch.py`; no pip install is needed. Deliver native editable cells and text. `save()` writes indented, multiline XML and validates it before replacing a file.
 
 Requires Python 3.9+ and a local filesystem. Generation and editing need no third-party Python packages or network access. Optional PNG export requires Draw.io Desktop; headless Linux export also requires Xvfb.
+
+Optional native label collision checking requires local Draw.io assets and Chromium/Chrome. It uses browser-measured text bounds and needs no extra Python packages.
 
 ## Generate
 
@@ -66,6 +68,8 @@ python3 "$SKILL_DIR/scripts/drawio_arch.py" export /absolute/user/workspace/desi
 ```
 
 `save()` already checks structure. `inspect` reports connections by ID and conservative bounds/manual-route warnings and estimated edge-label overlaps. For specified topology, use `p.assert_connections([(source_id, target_id, label), ...])`; child edge labels are included. These helpers avoid writing a new XML/SVG checker for each diagram.
+
+For dense diagrams, suspected label collisions, or requested in-depth verification, read [native checking and fixes](references/native-check.md). Run `python3 "$SKILL_DIR/scripts/drawio_arch.py" native-check /absolute/user/workspace/design.drawio` when its optional prerequisites are available. It reports measured overlaps by cell ID with severity and reasons, considering sampled paint order, fill opacity and label backgrounds. Review warnings, revise `label_offset`, label position/segment, or route spacing for unintended conflicts, and re-check affected pages. Do not automatically move readable labels for advisory/informational shape overlaps. Exit 0 can still include advisories; a failed renderer or unmeasured label is not a clean verification result. This check is read-only and does not replace visual inspection.
 
 PNG export uses optional Draw.io Desktop. `--headless` also needs Xvfb; omit it with a working display. Use `--no-sandbox` only when the execution environment requires Electron's flag. Library `--page 0` means the first page. PNGs crop to content on the tested Desktop version.
 

@@ -663,6 +663,8 @@ def main():
     validate.add_argument('source')
     inspect = commands.add_parser('inspect', help='Topology and conservative layout warnings (no renderer)')
     inspect.add_argument('source')
+    from drawio_native import add_arguments, run as run_native_check
+    add_arguments(commands.add_parser('native-check', help='Optional offline rendered label collision report (requires Draw.io assets and Chromium)'))
     export = commands.add_parser('export')
     export.add_argument('source')
     export.add_argument('output')
@@ -673,6 +675,8 @@ def main():
     export.add_argument('--executable', default='drawio')
     export.add_argument('--no-sandbox', action='store_true', help='Pass Electron flag only where required by the environment')
     args = parser.parse_args()
+    if args.command == 'native-check':
+        return run_native_check(args)
     if args.command == 'validate':
         errors = Diagram.load(args.source).validate()
         print('\n'.join(errors) if errors else 'Structural validation passed')

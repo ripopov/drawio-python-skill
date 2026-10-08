@@ -1,0 +1,17 @@
+Create an editable insurance-schema.drawio ER diagram with six tables. First field in each is ID (PK); fields ending in _ID are FKs.
+
+Coverage: ID, CoverageName, CoverageGroup, Code, IsPolicyCoverage, IsVehicleCoverage, Description.
+
+Policy: ID, PolicyNumber, PolicyEffectiveDate, PolicyExpireDate, PaymentOption, TotalAmount, Active, AdditionalInfo, CreatedDate.
+
+PolicyEditLog: ID, Policy_ID, EditedTableName, EditedDate, AdditionalInfo, EditedBy.
+
+Bill: ID, Policy_ID, DueDate, MinimumPayment, CreatedDate, Balance, Status.
+
+Policy_Coverage: ID, Policy_ID, Coverage_ID, Active, CreatedDate.
+
+Vehicle_Coverage: ID, Vehicle_ID, Coverage_ID, Active, CreatedDate.
+
+Use one-to-many crow’s-foot connections from Policy to PolicyEditLog, Bill, and Policy_Coverage; from Coverage to both coverage-link tables.
+
+Arrange Coverage/Vehicle_Coverage left, PolicyEditLog/Policy_Coverage center-left, Policy center-right, Bill right. Use rounded white tables, charcoal headers, a narrow PK/FK column, light gray background, and orthogonal connectors. Omit the Vehicle table.

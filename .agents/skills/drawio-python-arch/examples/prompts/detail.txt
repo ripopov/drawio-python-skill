@@ -1,0 +1,4 @@
+Show a sensor subsystem: sensor -> capture block -> sample FIFO -> DMA, all using 16-bit samples.
+Give capture its own detail page: input register -> AND mask gate -> output register.
+A 16-bit mask register feeds the gate's other input. All three registers use clk_sample.
+The overview should identify the capture detail page; show the shared clock clearly in the detail.

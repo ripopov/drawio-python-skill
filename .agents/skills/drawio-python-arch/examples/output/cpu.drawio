@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio-python-arch">
+  <diagram id="page-1" name="CPU">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1120" pageHeight="520" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell value="CPU" vertex="1" parent="1" style="swimlane;html=0;startSize=30;horizontal=1;fillColor=#f5f5f5;strokeColor=#666666;collapsible=0;align=center;verticalAlign=top;" id="c2">
+          <mxGeometry x="30" y="50" width="1040" height="370" as="geometry" />
+        </mxCell>
+        <mxCell value="Front-end" vertex="1" parent="c2" style="swimlane;html=0;startSize=30;horizontal=1;fillColor=#f5f5f5;strokeColor=#666666;collapsible=0;align=center;verticalAlign=top;" id="c3">
+          <mxGeometry x="25" y="55" width="310" height="240" as="geometry" />
+        </mxCell>
+        <mxCell value="Back-end" vertex="1" parent="c2" style="swimlane;html=0;startSize=30;horizontal=1;fillColor=#f5f5f5;strokeColor=#666666;collapsible=0;align=center;verticalAlign=top;" id="c4">
+          <mxGeometry x="360" y="55" width="650" height="240" as="geometry" />
+        </mxCell>
+        <mxCell value="BPU" vertex="1" parent="c3" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c5">
+          <mxGeometry x="25" y="60" width="100" height="55" as="geometry" />
+        </mxCell>
+        <mxCell value="IFU" vertex="1" parent="c3" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c6">
+          <mxGeometry x="175" y="60" width="100" height="55" as="geometry" />
+        </mxCell>
+        <mxCell value="IQ" vertex="1" parent="c3" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c7">
+          <mxGeometry x="175" y="160" width="100" height="55" as="geometry" />
+        </mxCell>
+        <mxCell value="Rename" vertex="1" parent="c4" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c8">
+          <mxGeometry x="25" y="160" width="120" height="55" as="geometry" />
+        </mxCell>
+        <mxCell value="Issue" vertex="1" parent="c4" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c9">
+          <mxGeometry x="180" y="160" width="120" height="55" as="geometry" />
+        </mxCell>
+        <mxCell value="Execute" vertex="1" parent="c4" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c10">
+          <mxGeometry x="335" y="160" width="120" height="55" as="geometry" />
+        </mxCell>
+        <mxCell value="ROB" vertex="1" parent="c4" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c11">
+          <mxGeometry x="490" y="160" width="120" height="55" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="1" source="c5" target="c6" value="prediction" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="1" source="c6" target="c7" value="instructions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" id="c13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="1" source="c7" target="c8" value="uops" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="1" source="c8" target="c9" value="uops" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="1" source="c9" target="c10" value="uops" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="1" source="c10" target="c11" value="uops" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="1" source="c11" target="c5" value="branch feedback" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#b85450;fontSize=12;dashed=1;fontColor=#b85450;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" id="c18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="940" y="85" />
+              <mxPoint x="105" y="85" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell value="BPU: Branch Prediction Unit   IFU: Instruction Fetch Unit   IQ: Instruction Queue&#10;ROB: Reorder Buffer" vertex="1" parent="1" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontSize=14;" id="c19">
+          <mxGeometry x="40" y="440" width="1010" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

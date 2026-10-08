@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio-python-arch">
+  <diagram id="overview" name="Overview">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell parent="0" value="Datapath" visible="1" style="locked=0;" id="c2" />
+        <mxCell value="Sensor" vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="sensor">
+          <mxGeometry x="40" y="120" width="170" height="65" as="geometry" />
+        </mxCell>
+        <mxCell value="Capture" vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="capture">
+          <mxGeometry x="280" y="120" width="170" height="65" as="geometry" />
+        </mxCell>
+        <mxCell value="Sample FIFO" vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="sample-fifo">
+          <mxGeometry x="520" y="120" width="170" height="65" as="geometry" />
+        </mxCell>
+        <mxCell value="DMA" vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="dma">
+          <mxGeometry x="760" y="120" width="170" height="65" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="c2" source="sensor" target="capture" value="16-bit samples" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;" id="c3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="c2" source="capture" target="sample-fifo" value="16-bit samples" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;" id="c4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="c2" source="sample-fifo" target="dma" value="16-bit samples" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;" id="c5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object link="data:page/id,capture-detail" id="c6" label="Capture detail →">
+          <mxCell vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;">
+            <mxGeometry x="280" y="230" width="170" height="40" as="geometry" />
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="capture-detail" name="Capture detail">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell value="Capture" vertex="1" parent="1" style="swimlane;html=0;startSize=30;horizontal=1;fillColor=#f5f5f5;strokeColor=#666666;collapsible=0;align=center;verticalAlign=top;" id="c2">
+          <mxGeometry x="30" y="60" width="840" height="400" as="geometry" />
+        </mxCell>
+        <mxCell value="Input register" vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c3">
+          <mxGeometry x="30" y="140" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell value="AND mask" vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;shape=stencil(fZHdDsIgDIWfhvtBk72AzvdgrDoyHAuwH99eSIkOYrwh/dpDTykMLn6UCzLR7AyuTAjeNPGMPBK3GaVfUAXKbdJp2Rukig/OTrjrIeQreh7R6ZCq0DG49FJND2fXeSBeZFKm6Gm3ZH3Qvez0OtONhEbPJ2H7R6lWRz15fg+HLOaFyyHquiibH1CZlfxzsHKuUqmM9fihGHzXEKHe0d06LFgbQ4s+t6hVMUXfCd0b);" id="c4">
+          <mxGeometry x="310" y="140" width="110" height="60" as="geometry" />
+        </mxCell>
+        <mxCell value="Output register" vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c5">
+          <mxGeometry x="600" y="140" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell value="16-bit mask register" vertex="1" parent="c2" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c6">
+          <mxGeometry x="275" y="290" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="c2" source="c3" target="c4" value="16-bit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;entryX=0;entryY=0.3;entryDx=0;entryDy=0;entryPerimeter=0;" id="c7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="c2" source="c4" target="c5" value="16-bit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;" id="c8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="c2" source="c6" target="c4" value="16-bit mask" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#333333;fontSize=12;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;entryPerimeter=0;" id="c9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="320" />
+              <mxPoint x="240" y="182" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell parent="0" value="Clock" visible="1" style="locked=0;" id="c10" />
+        <mxCell value="clk_sample" vertex="1" parent="c10" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" id="c11">
+          <mxGeometry x="40" y="510" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="c10" source="c11" target="c3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#b85450;fontSize=12;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" id="c12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="490" />
+              <mxPoint x="135" y="490" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell edge="1" parent="c10" source="c11" target="c5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#b85450;fontSize=12;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" id="c13">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="490" />
+              <mxPoint x="705" y="490" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell edge="1" parent="c10" source="c11" target="c6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#b85450;fontSize=12;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" id="c14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="490" />
+              <mxPoint x="400" y="490" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

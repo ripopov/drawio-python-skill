@@ -1,0 +1,5 @@
+Draw a CPU as nested boxes on one page, with Front-end and Back-end inside it and their units inside those.
+Front-end contains BPU, IFU, and IQ; Back-end contains Rename, Issue, Execute, and ROB.
+Show BPU -> IFU (prediction), IFU -> IQ (instructions), and IQ -> Rename -> Issue -> Execute -> ROB (uops).
+Also show ROB -> BPU (branch feedback) as control; the other arrows are forward data flow.
+Keep widths unspecified and expand the abbreviations in a short note. No caches or other units are needed.

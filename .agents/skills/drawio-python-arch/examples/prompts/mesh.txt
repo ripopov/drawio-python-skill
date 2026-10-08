@@ -1,0 +1,3 @@
+Draw a 4x4 mesh NoC, routers R00 through R33, with rows and columns matching those names.
+Connect only horizontal and vertical neighbors, with a bidirectional 128-bit link per pair.
+No wraparound or diagonals. Mark north/east/south/west ports and keep the mesh easy to follow.

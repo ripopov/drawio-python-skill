@@ -1,0 +1,22 @@
+Create an editable BPMN-style DRAWIO diagram on a light-gray canvas with two horizontal pools: SCHEDULING above FACTORY. Each pool has a thin gray rounded border and a narrow peach left strip with its name written vertically.
+ Use small dark-charcoal rounded task boxes with bold white text, thin gray arrows, and circular events.
+
+ SCHEDULING, left to right:
+ Start circle → Get Task → Create Schedule → Verify Schedule → Commit Schedule → thick-outline end circle.
+
+ Between the pools, place an orange folded-corner document labeled “Order List”. A dashed connector runs from Create Schedule downward, then left into the document. A dashed vertical association with open arrowheads at
+ both ends connects the document to the factory’s inner start circle.
+
+ FACTORY:
+ Place a clock/timer event on the left, pointing right into a large pale-peach rounded activity region. Inside this region, arrange:
+ Start circle → Compose Specification → Check Warehouse → Available? → Produce Goods → message completion circle.
+
+ Keep “Available?” as a rounded rectangle. Label its rightward arrow “Yes”. Its downward arrow, labeled “No”, leads to a white message circle with an outlined envelope; connect that circle rightward, then upward into
+ Produce Goods.
+
+ The completion circle has a thick black outline and a black envelope with white flap lines. From its top, route a dashed connector upward, left between the pools, then upward into Create Schedule. Label its horizontal
+ segment “Order Completed”.
+
+ Outside the peach region, on the factory’s far right, place a thick-outline end circle with an arrow entering from the region’s right edge.
+
+ Use generous spacing, no title or legend. Deliver the editable diagram and a PNG preview.

@@ -1,0 +1,10 @@
+Create an AXI test-system block diagram; deliver editable axi_test_system.drawio and a rendered axi_test_system.png.
+Layout: Test Control top center; a full-width AXI Interconnect below; AXI2AXI-Lite and AXI-Lite bus simplifier stacked centrally; S2MM, MM2S, MM2M, Memory along the bottom.
+Ports: Test Control [AXI master]; converter [Full input, Lite output]; simplifier [one upstream connection, four downstream ports]; S2MM/MM2S/MM2M [Full, Lite]; Memory [Full].
+Main connection: Test Control.AXI master -> AXI Interconnect.
+Full AXI connections: AXI Interconnect -> S2MM.Full; AXI Interconnect -> MM2S.Full; AXI Interconnect -> MM2M.Full; AXI Interconnect -> Memory.Full.
+Control bridge: AXI Interconnect -> AXI2AXI-Lite.Full; AXI2AXI-Lite.Lite -> AXI-Lite bus simplifier upstream.
+Control fanout: simplifier.port0 -> S2MM.Lite; simplifier.port1 -> MM2S.Lite; simplifier.port2 -> MM2M.Lite; leave port3 unconnected.
+Treat arrows as schematic connectivity, not definitive AXI master/slave assignments; use orthogonal routing and line jumps at unconnected crossings.
+Style: gray blocks, lavender interconnect, cyan interconnect ports, yellow Full ports, pale-yellow Lite ports, black outlines and connectors, white background.
+Render and inspect the PNG; correct clipping, label overlap, and ambiguous routing before delivering both files. in axi-inter directory

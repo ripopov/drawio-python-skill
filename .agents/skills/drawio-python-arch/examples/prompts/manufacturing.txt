@@ -1,0 +1,21 @@
+Create an editable manufacturing.drawio file using valid diagrams.net XML. Draw this manufacturing flowchart:
+
+Start → Process raw materials → Inspect raw materials → Materials quality OK?
+
+Yes → Begin production → Assemble widgets → Initial testing → Pass initial testing?
+
+No → Reject and return materials → Process raw materials.
+
+Pass initial testing?
+
+Yes → Quality control → Pass quality control?
+
+No → Rework → Assemble widgets.
+
+Pass quality control?
+
+Yes → Package widgets → Ship widgets → End.
+
+No → Scrap → Begin production.
+
+Use pale-blue rounded rectangles for processes, pale-orange diamonds for decisions, and pale-yellow ovals for Start/End. Use thin dark outlines, black text, orthogonal arrow connectors, and Yes/No branch labels. Arrange the initial material steps across the upper left, production and testing across the middle, and packaging/shipping along the bottom right. Route return loops around the outside; avoid overlaps.

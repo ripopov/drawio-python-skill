@@ -1,0 +1,338 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio-python-arch">
+  <diagram id="page-1" name="Insurance">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1340" pageHeight="720" background="#f0f0f0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell value="" vertex="1" parent="1" style="group;" id="Coverage">
+          <mxGeometry x="30" y="60" width="260" height="218" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Coverage" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#333333;fontSize=13;" id="Coverage:body">
+          <mxGeometry x="0" y="0" width="260" height="218" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Coverage" vertex="1" parent="Coverage" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#333333;strokeColor=none;fontSize=14;fontColor=#ffffff;fontStyle=1;" id="Coverage:header">
+          <mxGeometry x="2" y="2" width="256" height="30" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PK" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:key:0">
+          <mxGeometry x="2" y="32" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="ID" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:row:0">
+          <mxGeometry x="44" y="32" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:key:1">
+          <mxGeometry x="2" y="58" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="CoverageName" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:row:1">
+          <mxGeometry x="44" y="58" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:key:2">
+          <mxGeometry x="2" y="84" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="CoverageGroup" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:row:2">
+          <mxGeometry x="44" y="84" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:key:3">
+          <mxGeometry x="2" y="110" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Code" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:row:3">
+          <mxGeometry x="44" y="110" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:key:4">
+          <mxGeometry x="2" y="136" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="IsPolicyCoverage" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:row:4">
+          <mxGeometry x="44" y="136" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:key:5">
+          <mxGeometry x="2" y="162" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="IsVehicleCoverage" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:row:5">
+          <mxGeometry x="44" y="162" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:key:6">
+          <mxGeometry x="2" y="188" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Description" vertex="1" parent="Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Coverage:row:6">
+          <mxGeometry x="44" y="188" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell value="" vertex="1" parent="1" style="group;" id="Vehicle_Coverage">
+          <mxGeometry x="30" y="390" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Vehicle_Coverage" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#333333;fontSize=13;" id="Vehicle_Coverage:body">
+          <mxGeometry x="0" y="0" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Vehicle_Coverage" vertex="1" parent="Vehicle_Coverage" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#333333;strokeColor=none;fontSize=14;fontColor=#ffffff;fontStyle=1;" id="Vehicle_Coverage:header">
+          <mxGeometry x="2" y="2" width="256" height="30" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PK" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:key:0">
+          <mxGeometry x="2" y="32" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="ID" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:row:0">
+          <mxGeometry x="44" y="32" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="FK" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:key:1">
+          <mxGeometry x="2" y="58" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Vehicle_ID" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:row:1">
+          <mxGeometry x="44" y="58" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="FK" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:key:2">
+          <mxGeometry x="2" y="84" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Coverage_ID" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:row:2">
+          <mxGeometry x="44" y="84" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:key:3">
+          <mxGeometry x="2" y="110" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Active" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:row:3">
+          <mxGeometry x="44" y="110" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:key:4">
+          <mxGeometry x="2" y="136" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="CreatedDate" vertex="1" parent="Vehicle_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Vehicle_Coverage:row:4">
+          <mxGeometry x="44" y="136" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell value="" vertex="1" parent="1" style="group;" id="PolicyEditLog">
+          <mxGeometry x="370" y="60" width="260" height="192" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="PolicyEditLog" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#333333;fontSize=13;" id="PolicyEditLog:body">
+          <mxGeometry x="0" y="0" width="260" height="192" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PolicyEditLog" vertex="1" parent="PolicyEditLog" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#333333;strokeColor=none;fontSize=14;fontColor=#ffffff;fontStyle=1;" id="PolicyEditLog:header">
+          <mxGeometry x="2" y="2" width="256" height="30" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PK" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:key:0">
+          <mxGeometry x="2" y="32" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="ID" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:row:0">
+          <mxGeometry x="44" y="32" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="FK" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:key:1">
+          <mxGeometry x="2" y="58" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Policy_ID" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:row:1">
+          <mxGeometry x="44" y="58" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:key:2">
+          <mxGeometry x="2" y="84" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="EditedTableName" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:row:2">
+          <mxGeometry x="44" y="84" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:key:3">
+          <mxGeometry x="2" y="110" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="EditedDate" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:row:3">
+          <mxGeometry x="44" y="110" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:key:4">
+          <mxGeometry x="2" y="136" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="AdditionalInfo" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:row:4">
+          <mxGeometry x="44" y="136" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:key:5">
+          <mxGeometry x="2" y="162" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="EditedBy" vertex="1" parent="PolicyEditLog" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="PolicyEditLog:row:5">
+          <mxGeometry x="44" y="162" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell value="" vertex="1" parent="1" style="group;" id="Policy_Coverage">
+          <mxGeometry x="370" y="390" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy_Coverage" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#333333;fontSize=13;" id="Policy_Coverage:body">
+          <mxGeometry x="0" y="0" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Policy_Coverage" vertex="1" parent="Policy_Coverage" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#333333;strokeColor=none;fontSize=14;fontColor=#ffffff;fontStyle=1;" id="Policy_Coverage:header">
+          <mxGeometry x="2" y="2" width="256" height="30" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PK" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:key:0">
+          <mxGeometry x="2" y="32" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="ID" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:row:0">
+          <mxGeometry x="44" y="32" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="FK" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:key:1">
+          <mxGeometry x="2" y="58" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Policy_ID" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:row:1">
+          <mxGeometry x="44" y="58" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="FK" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:key:2">
+          <mxGeometry x="2" y="84" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Coverage_ID" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:row:2">
+          <mxGeometry x="44" y="84" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:key:3">
+          <mxGeometry x="2" y="110" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Active" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:row:3">
+          <mxGeometry x="44" y="110" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:key:4">
+          <mxGeometry x="2" y="136" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="CreatedDate" vertex="1" parent="Policy_Coverage" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy_Coverage:row:4">
+          <mxGeometry x="44" y="136" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell value="" vertex="1" parent="1" style="group;" id="Policy">
+          <mxGeometry x="710" y="220" width="260" height="270" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#333333;fontSize=13;" id="Policy:body">
+          <mxGeometry x="0" y="0" width="260" height="270" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Policy" vertex="1" parent="Policy" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#333333;strokeColor=none;fontSize=14;fontColor=#ffffff;fontStyle=1;" id="Policy:header">
+          <mxGeometry x="2" y="2" width="256" height="30" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PK" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:0">
+          <mxGeometry x="2" y="32" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="ID" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:0">
+          <mxGeometry x="44" y="32" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:1">
+          <mxGeometry x="2" y="58" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PolicyNumber" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:1">
+          <mxGeometry x="44" y="58" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:2">
+          <mxGeometry x="2" y="84" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PolicyEffectiveDate" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:2">
+          <mxGeometry x="44" y="84" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:3">
+          <mxGeometry x="2" y="110" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PolicyExpireDate" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:3">
+          <mxGeometry x="44" y="110" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:4">
+          <mxGeometry x="2" y="136" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PaymentOption" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:4">
+          <mxGeometry x="44" y="136" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:5">
+          <mxGeometry x="2" y="162" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="TotalAmount" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:5">
+          <mxGeometry x="44" y="162" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:6">
+          <mxGeometry x="2" y="188" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Active" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:6">
+          <mxGeometry x="44" y="188" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:7">
+          <mxGeometry x="2" y="214" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="AdditionalInfo" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:7">
+          <mxGeometry x="44" y="214" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:key:8">
+          <mxGeometry x="2" y="240" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="CreatedDate" vertex="1" parent="Policy" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Policy:row:8">
+          <mxGeometry x="44" y="240" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell value="" vertex="1" parent="1" style="group;" id="Bill">
+          <mxGeometry x="1050" y="220" width="260" height="218" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Bill" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#333333;fontSize=13;" id="Bill:body">
+          <mxGeometry x="0" y="0" width="260" height="218" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Bill" vertex="1" parent="Bill" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#333333;strokeColor=none;fontSize=14;fontColor=#ffffff;fontStyle=1;" id="Bill:header">
+          <mxGeometry x="2" y="2" width="256" height="30" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="PK" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:key:0">
+          <mxGeometry x="2" y="32" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="ID" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:row:0">
+          <mxGeometry x="44" y="32" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="FK" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:key:1">
+          <mxGeometry x="2" y="58" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Policy_ID" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:row:1">
+          <mxGeometry x="44" y="58" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:key:2">
+          <mxGeometry x="2" y="84" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="DueDate" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:row:2">
+          <mxGeometry x="44" y="84" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:key:3">
+          <mxGeometry x="2" y="110" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="MinimumPayment" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:row:3">
+          <mxGeometry x="44" y="110" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:key:4">
+          <mxGeometry x="2" y="136" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="CreatedDate" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:row:4">
+          <mxGeometry x="44" y="136" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:key:5">
+          <mxGeometry x="2" y="162" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Balance" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:row:5">
+          <mxGeometry x="44" y="162" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:key:6">
+          <mxGeometry x="2" y="188" width="42" height="26" as="geometry" />
+        </mxCell>
+        <mxCell connectable="0" value="Status" vertex="1" parent="Bill" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;fontSize=13;spacingLeft=6;" id="Bill:row:6">
+          <mxGeometry x="44" y="188" width="214" height="26" as="geometry" />
+        </mxCell>
+        <mxCell edge="1" parent="1" source="Policy" target="PolicyEditLog" value="" style="edgeStyle=none;rounded=0;html=0;endArrow=ERmany;strokeColor=#333333;fontSize=12;startArrow=ERone;startFill=0;endFill=0;strokeWidth=1.5;startSize=10;endSize=12;noEdgeStyle=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="670" y="355" />
+              <mxPoint x="670" y="156" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell edge="1" parent="1" source="Policy" target="Policy_Coverage" value="" style="edgeStyle=none;rounded=0;html=0;endArrow=ERmany;strokeColor=#333333;fontSize=12;startArrow=ERone;startFill=0;endFill=0;strokeWidth=1.5;startSize=10;endSize=12;noEdgeStyle=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="670" y="355" />
+              <mxPoint x="670" y="473" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell edge="1" parent="1" source="Policy" target="Bill" value="" style="edgeStyle=none;rounded=0;html=0;endArrow=ERmany;strokeColor=#333333;fontSize=12;startArrow=ERone;startFill=0;endFill=0;strokeWidth=1.5;startSize=10;endSize=12;noEdgeStyle=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c4">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1010" y="355" />
+              <mxPoint x="1010" y="329" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell edge="1" parent="1" source="Coverage" target="Policy_Coverage" value="" style="edgeStyle=none;rounded=0;html=0;endArrow=ERmany;strokeColor=#333333;fontSize=12;startArrow=ERone;startFill=0;endFill=0;strokeWidth=1.5;startSize=10;endSize=12;noEdgeStyle=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" id="c5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="169" />
+              <mxPoint x="330" y="473" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell edge="1" parent="1" source="Coverage" target="Vehicle_Coverage" value="" style="edgeStyle=none;rounded=0;html=0;endArrow=ERmany;strokeColor=#333333;fontSize=12;startArrow=ERone;startFill=0;endFill=0;strokeWidth=1.5;startSize=10;endSize=12;noEdgeStyle=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" id="c6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="334" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

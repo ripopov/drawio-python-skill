@@ -1,0 +1,21 @@
+ Generate an editable draw.io diagram showing the microarchitecture of an L1 data cache. Output a valid .drawio XML file using native shapes and connectors.
+Assume:
+- 32 KiB capacity, 8-way set associative, 64-byte cache lines: 64 sets.
+- 48-bit physical addresses.
+- Physically indexed, physically tagged.
+- Write-back, write-allocate policy.
+- Non-blocking operation using MSHRs.
+Show these components and connections:
+1. CPU load/store interface: physical address, request type, store data, byte enables; returned load data and completion.
+2. Address decomposition: tag [47:12], set index [11:6], byte offset [5:0].
+3. Tag and metadata arrays: eight ways, each storing tag, valid, and dirty bits. The set index selects entries in all ways.
+4. Tag comparison: eight parallel comparators; each way hits when valid and its tag matches. Show the resulting hit vector.
+5. Data arrays: eight ways; set index selects cache lines, hit vector controls the way-selection mux, and byte offset controls word/byte selection.
+6. Load-hit path: selected data returns to the CPU.
+7. Store-hit path: store data and byte enables update the selected way and set its dirty bit.
+8. Miss-handling path: MSHRs track outstanding misses and merge requests to the same cache line.
+9. Replacement logic: choose an invalid way first; otherwise use tree-PLRU. A dirty victim enters the write-back buffer.
+10. L2 interface: refill requests, returned cache lines, and dirty-line write-backs. Refills update data, tags, and metadata, then complete pending CPU requests.
+
+
+ save in ./examples/l1-cache

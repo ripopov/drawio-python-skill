@@ -1,0 +1,42 @@
+@drawio-architecture Create an editable Draw.io (.drawio) diagram showing a simple home network. Use native Draw.io shapes, connectors, and editable text so the diagram can be modified without external images.
+
+Canvas and style:
+- Portrait canvas, approximately 450 × 680 pixels, with a white background.
+- Clean, flat illustration style using blue equipment icons, black text, and black connections.
+- Use bold sans-serif labels, approximately 32 pixels tall.
+- Center the main network chain vertically and leave clear spacing between elements.
+- Do not add a title, legend, border, shadows, or extra annotations.
+
+Arrange the following elements from top to bottom:
+
+1. Internet
+   - Center the label “Internet” near the top, at approximately (225, 60).
+   - Below it, draw a blue globe icon about 72 × 72 pixels: an outlined circle with curved longitude lines and horizontal latitude lines.
+   - Connect the bottom of the globe to the router section with a black downward arrow.
+
+2. Router
+   - Center the label “Router” at approximately (225, 230).
+   - Below the label, draw a blue wireless router about 155 pixels wide and 55 pixels tall.
+   - Give it a rounded body, a slightly curved blue top, a darker blue front panel, two upright black antennas, and three small green indicator lights on the front.
+   - Place the router body around y = 290–345.
+   - Connect its bottom center to the switch section with a black downward arrow.
+
+3. Switch
+   - Center the label “Switch” at approximately (225, 410).
+   - Below it, draw a blue rectangular Ethernet switch about 136 × 45 pixels, with slightly rounded corners.
+   - Show five small light-blue square port indicators across its front.
+   - Place the switch around y = 432–477.
+
+4. Devices
+   - Place three blue device icons in a horizontal row beneath the switch:
+     - Left: a desktop monitor with a light-blue screen, dark-blue frame, and small stand, centered near x = 125.
+     - Center: an open laptop with a light-blue screen and dark-blue base, centered near x = 225.
+     - Right: a smartphone in portrait orientation with a light-blue screen, dark-blue frame, and tiny speaker and home-button details, centered near x = 335.
+   - Keep the device icons approximately within y = 520–585.
+   - Draw three black connections from the bottom of the switch: diagonally down-left to the monitor, straight down to the laptop, and diagonally down-right to the smartphone. These connections should have no arrowheads.
+   - Center the bold label “Devices” beneath the row, near (225, 615).
+
+Maintain the visual hierarchy:
+Internet → Router → Switch → three connected devices.
+
+Group each equipment icon’s component shapes so it can be moved as a unit. Keep labels separately editable. Ensure connectors do not overlap labels or device interiors. Save the completed diagram as network.drawio.

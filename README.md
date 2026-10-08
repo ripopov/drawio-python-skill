@@ -2,15 +2,19 @@
 
 A self-contained [Agent Skills](https://agentskills.io/specification) package for generating and editing native, editable Draw.io diagrams with Python. It focuses on SoC architecture and microarchitecture and also supports flowcharts, schemas, swimlanes, networks, and illustrations built from native shapes.
 
-The bundled API uses only the Python standard library. It provides shapes, ports, containers, layers, multiple pages, deterministic connectors, tables, metadata, structural validation, and targeted edits to existing diagrams.
+The bundled API provides shapes, ports, containers, layers, multiple pages, deterministic connectors, tables, metadata, structural validation, and targeted edits to existing diagrams. Connector routing is explicit; generation does not automatically avoid obstacles or measure text.
+
+Dense diagrams can be structurally valid but hard to read: connection labels overlap each other, sit too close together, or disappear behind shapes. Structural validation alone cannot detect these rendering problems.
+
+The optional **native checker** uses Draw.io's renderer to measure label bounds and inspect paint order, then highlights potential issues with numbered ovals and explanations. Two independent **automatic fixers** address supported cases: one adjusts label offsets, and the other raises an edge above a shape hiding its label. Both preserve text, styles, shapes, routes and connections, verify the saved result, and leave cases they cannot safely repair for review.
+
+The example below has eight shapes and 24 labeled connections, with deliberate defects. Checking the [original editable diagram](docs/native-label-check.drawio) finds five warnings, two advisories and one informational overlap. **Red = warning, amber = advisory, blue = info.** An oval marks a finding for review, not necessarily a defect.
 
 ![Diagram before repair: eight shapes and 24 labeled connections, with warnings in red, advisories in amber and info in blue](docs/native-label-check.png)
 
-The [original editable diagram](docs/native-label-check.drawio) intentionally contains defects: five warnings, two advisories and one informational overlap. **Red = warning, amber = advisory, blue = info.** Numbered ovals match the severity and explanation in the legend.
+After both fixers run, the overlapping labels are separated and the hidden label is visible. Rechecking the [fixed editable diagram](docs/native-label-check-fixed.drawio) finds zero warnings, two advisories and two informational findings:
 
 ![Diagram after automatic stacking and label-offset repairs, with remaining advisory and informational findings highlighted](docs/native-label-check-fixed.png)
-
-The [fixed editable diagram](docs/native-label-check-fixed.drawio) has zero warnings, two advisories and two informational findings. The fixers separate overlapping labels and reveal the hidden label while preserving text, styles, shapes, routes and connections. The remaining overlaps stay visible for review; an oval does not necessarily indicate a defect.
 
 Reproduce both images and the fixed diagram from the original source:
 
@@ -18,9 +22,7 @@ Reproduce both images and the fixed diagram from the original source:
 python3 docs/regenerate-native-label-check.py --headless
 ```
 
-The [script](docs/regenerate-native-label-check.py) checks and renders the original, runs the independent stacking fixer followed by the offset fixer, then checks and renders the saved result. It requires Chromium/Chrome, local Draw.io assets and Draw.io Desktop (plus Xvfb for `--headless`). Omit `--headless` when a display is available; add `--no-sandbox` only where the browser sandbox cannot run. Use `--help` for explicit renderer paths.
-
-Rerunning replaces the two PNGs and `native-label-check-fixed.drawio` in `docs` after rendering succeeds, leaving the source unchanged. Use `--output-dir /tmp/drawio-docs` for a separate destination. Exit 0 means no warnings or unmeasured labels remain, 1 means a verified partial result was generated, and 2 means generation failed.
+The [script](docs/regenerate-native-label-check.py) runs stacking repair before offset repair. It replaces the generated artifacts in `docs` only after rendering succeeds; use `--output-dir /tmp/drawio-docs` for a separate destination. Exit 0 means no warnings or unmeasured labels remain, 1 means a verified partial result was generated, and 2 means generation failed.
 
 ## Install and use
 
@@ -48,12 +50,28 @@ Ask your agent to use `drawio-python-arch`, for example:
 
 Requirements:
 
-- Python 3.9 or later for generation, editing, and structural checks. No pip installation is needed.
-- Draw.io Desktop for optional PNG export.
-- Xvfb for optional headless PNG export on Linux.
-- Chromium/Chrome plus local Draw.io assets for optional native label collision checking.
+- Python 3.9+; no pip dependencies.
+- Draw.io Desktop for PNG export and renderer assets; Xvfb for headless Linux export.
+- Chromium/Chrome for native checks and automatic fixes.
 
-The output `.drawio` files can be opened and edited in Draw.io Desktop or diagrams.net. Connector routing is explicit; the library does not automatically avoid obstacles or measure text.
+For PNG commands, omit `--headless` when a display is available. Add `--no-sandbox` only where the browser sandbox cannot run; use `--help` for explicit renderer paths.
+
+Install on **Ubuntu 22.04/24.04 (`amd64`)**:
+
+```bash
+sudo apt update
+sudo apt install -y python3 git curl ca-certificates xvfb xauth fonts-liberation snapd
+sudo snap install drawio
+
+# Chrome
+drawio_deps_dir="$(mktemp -d /tmp/drawio-deps.XXXXXX)"
+chmod 755 "$drawio_deps_dir"
+curl -fL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+  -o "$drawio_deps_dir/google-chrome.deb"
+sudo apt install -y "$drawio_deps_dir/google-chrome.deb"
+```
+
+For Snap, add `--drawio-asar /snap/drawio/current/resources/app.asar` to native checks, fixers and the documentation script. Snap PNG export is unverified; confinement may block temporary or hidden paths used by reports.
 
 ## Package contents
 
@@ -79,48 +97,37 @@ python3 scripts/drawio_arch.py inspect /tmp/drawio-demo/axi_test_system.drawio
 python3 -m unittest discover -s tests -v
 ```
 
-For optional native rendering:
+Export a PNG:
 
 ```bash
 python3 scripts/drawio_arch.py export /tmp/drawio-demo/axi_test_system.drawio /tmp/drawio-demo/axi_test_system.png --headless
 ```
 
-Omit `--headless` when a display is available. Structural checks do not replace visual inspection; see the [verification notes](references/verification.md) for supported features and limits.
-
-For deeper verification, check actual rendered label bounds without modifying the diagram:
+Get a native check as JSON:
 
 ```bash
 python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.drawio
 ```
 
-Generate a complete visual report in one command (also requires Draw.io Desktop, and Xvfb with `--headless`):
+Add a visual report:
 
 ```bash
 python3 scripts/drawio_arch.py native-check /tmp/drawio-demo/axi_test_system.drawio \
   --report-dir /tmp/axi-visual-report --headless
 ```
 
-Use a new output directory. It contains `report.json`, `annotated.drawio` with a separate editable findings layer, and `page-1.png` (one PNG per checked page). Numbered ovals use red for warnings, amber for advisories and blue for info, matching the legend entries and JSON `highlight_color`. All severities are highlighted by default; `--highlight warning` or `--highlight warning,advisory` filters the illustrations without hiding findings from the JSON or changing the failure threshold. Generation is fully scripted; deciding whether a finding needs a fix still requires review. The source diagram stays unchanged.
+Use a new output directory. It contains `report.json`, `annotated.drawio` with a separate editable findings layer, and one PNG per checked page. JSON includes label IDs, bounds, reasons and `highlight_color`. All severities are highlighted by default; `--highlight warning` or `--highlight warning,advisory` filters the illustrations without hiding findings from JSON or changing the failure threshold.
 
-The optional checker runs Draw.io's local JavaScript renderer in headless Chromium and returns JSON containing label IDs, measured bounds, and potential collisions with severity and reasons. Shape overlaps consider sampled paint order, fill transparency, and native label backgrounds. Warnings affect the default exit code; advisories remain available for review (`--fail-on advisory` enables a stricter threshold). It needs no Xvfb or third-party Python packages. See [native checking and fixes](references/native-check.md) for dependency paths, exit codes, limitations, and the fix-and-recheck workflow.
+Warnings affect the default checker exit code; `--fail-on advisory` enables a stricter threshold. See [native checking](references/native-check.md) for collision rules and exit codes, and [verification notes](references/verification.md) for tested features and limits.
 
-For conservative automatic label fixes:
+Run either fixer without `--output` for a verified dry-run, or save to a new file:
 
 ```bash
-# Verified dry-run: JSON proposals, no diagram written
-python3 scripts/drawio_arch.py native-fix design.drawio
-
-# Apply to a new file and independently verify its native rendering
+# Label offsets
 python3 scripts/drawio_arch.py native-fix design.drawio --output design-fixed.drawio
-```
 
-The fixer changes only connection-label offsets. Text, styles, shapes, ports, routes, topology, and metadata are preserved and checked against the source. It uses bounded native-rendered candidates, including coupled label moves, and retains unresolved cases when a safe local move cannot be found. `--keep ID` freezes intentional placements; `--only ID` limits repairs. See [automatic repair](references/native-fix.md) for limits, receipts, and generator updates.
-
-For a label hidden behind an opaque shape, there is a **separate stacking-only fixer**:
-
-```bash
-python3 scripts/drawio_arch.py native-stack-fix design.drawio
+# Stacking (suggested by occlusion warnings)
 python3 scripts/drawio_arch.py native-stack-fix design.drawio --output design-stacked.drawio
 ```
 
-Occlusion warnings suggest this command. It preserves every coordinate and style, changing only the owning edge's order relative to sibling cells. Native verification confirms the label is in front; conservative checks reject raising its line through shapes or over other text and overlapping connections. See [stacking repair](references/native-stack-fix.md) for supported cases and exit codes. Offset and stacking repairs are independent.
+Checks and fixers leave the source unchanged. Use `--keep ID` to protect cells and `--only ID` to select labels for repair. See [offset repair](references/native-fix.md) and [stacking repair](references/native-stack-fix.md) for safety checks, supported cases, receipts and generator updates.

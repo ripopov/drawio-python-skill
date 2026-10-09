@@ -113,13 +113,21 @@ Export a PNG:
 python3 scripts/drawio_arch.py export "$drawio_demo_dir/axi_test_system.drawio" "$drawio_demo_dir/axi_test_system.png" --headless
 ```
 
-Export an SVG with adaptive light/dark colors (the default):
+Export an SVG with fixed light colors on a white background (the default):
 
 ```bash
 python3 scripts/drawio_arch.py export "$drawio_demo_dir/axi_test_system.drawio" "$drawio_demo_dir/axi_test_system.svg" --headless
 ```
 
-The output extension selects SVG or PNG; `--format svg|png` overrides it. For SVG, `--theme light` or `--theme dark` selects fixed colors. Adaptive SVG follows the viewer's CSS color scheme, so VS Code preview behavior depends on the preview exposing the selected theme. The Python API provides `export_svg(...)` alongside `export_png(...)`; both preserve existing outputs on failure.
+The output extension selects SVG or PNG; `--format svg|png` overrides it. Default SVG export resolves embedded theme CSS to plain light colors and adds an opaque white background, so it looks the same in light and dark viewers. The previews in `examples/output` use this default. The Python API provides `export_svg(...)` alongside `export_png(...)`; both preserve existing outputs on failure.
+
+For an adaptive SVG with a transparent background, opt in with `--theme auto`:
+
+```bash
+python3 scripts/drawio_arch.py export "$drawio_demo_dir/axi_test_system.drawio" "$drawio_demo_dir/axi_test_system-adaptive.svg" --theme auto --headless
+```
+
+Adaptive SVG follows the viewer's CSS color scheme; VS Code's built-in Linux preview follows the system preference independently of the selected editor theme. `--theme dark` exports fixed dark colors on a transparent background.
 
 Get a native check as JSON:
 

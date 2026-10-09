@@ -1,6 +1,6 @@
 ---
 name: drawio-python-arch
-description: Generate and edit editable Draw.io diagrams with a bundled Python standard-library API. Use for SoC hardware architecture, microarchitecture, flowcharts, schemas, swimlanes, networks and native-shape illustrations. Includes deterministic connections, records, structural checks, optional PNG and adaptive SVG export, native label collision verification and conservative label repair.
+description: Generate and edit editable Draw.io diagrams with a bundled Python standard-library API. Use for SoC hardware architecture, microarchitecture, flowcharts, schemas, swimlanes, networks and native-shape illustrations. Includes deterministic connections, records, structural checks, optional PNG and SVG export, native label collision verification and conservative label repair.
 ---
 
 # Draw.io with Python
@@ -78,8 +78,9 @@ For requested overlap fixes, use `native-fix design.drawio` for a verified dry-r
 
 For `possible-label-occlusion` warnings, consider the separate `native-stack-fix design.drawio` first; the warning includes this suggestion. Read [stacking-only repair](docs/native-stack-fix.md). It keeps label positions/styles fixed and tests a minimal reorder of the owning edge above a sibling shape. Use `--output design-stacked.drawio` to apply to a new file. Reordering also raises the line, so the fixer rejects unsafe crossings/obscuration and cross-layer cases. Neither fixer invokes the other.
 
-Image export selects SVG for a `.svg` output, otherwise PNG; `--format svg` or `--format png` overrides this. SVG defaults to adaptive light/dark colors (`--theme auto`); use `--theme light` or `--theme dark` only when fixed colors are requested. Python callers can use `export_svg(..., theme='auto')`. Adaptive SVG follows the viewer's CSS color scheme; VS Code previews must expose that scheme to follow the selected editor theme. Source page adaptive-color settings are retained.
-Hardcoded hex colors on shapes and labels still receive dark-mode variants in adaptive SVG export unless the source diagram explicitly disables adaptive colors.
+Image export selects SVG for a `.svg` output, otherwise PNG; `--format svg` or `--format png` overrides this. SVG defaults to a fixed light palette on an opaque white background, with embedded theme CSS resolved to plain colors so the diagram looks the same in light and dark system themes. Python callers can use `export_svg(...)` or `export_svg(..., theme='light')`.
+
+Use `--theme auto` (Python: `theme='auto'`) only when adaptive SVG is requested; this keeps the background transparent and preserves Draw.io's light/dark color pairs. Hardcoded hex colors on shapes and labels still receive dark-mode variants in adaptive SVG export unless the source diagram explicitly disables adaptive colors. Adaptive SVG follows the viewer's CSS color scheme; VS Code's built-in preview on Linux follows the system preference rather than the selected editor theme. `--theme dark` exports fixed dark colors on a transparent background. Export does not change source page settings.
 
 PNG/SVG export uses optional Draw.io Desktop. `--headless` also needs Xvfb; omit it with a working display. Use `--no-sandbox` only when the execution environment requires Electron's flag. Library `--page 0` means the first page. Images can crop to content. Both exporters validate the native output before atomically replacing the destination; failed exports preserve existing files.
 

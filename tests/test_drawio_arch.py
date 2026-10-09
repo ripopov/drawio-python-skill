@@ -148,10 +148,10 @@ class SvgExportTests(unittest.TestCase):
         self.assertEqual(self.output.read_bytes(), b'previous SVG')
         self.assertEqual(sorted(p.name for p in self.root.iterdir()), ['out.svg', 'source.drawio'])
 
-    def test_adaptive_default_preserves_native_svg_and_selects_page(self):
+    def test_adaptive_option_preserves_native_svg_and_selects_page(self):
         data = self.svg()
         with patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)) as run:
-            self.assertEqual(export_svg(self.source, self.output, page=1, scale=1.5,
+            self.assertEqual(export_svg(self.source, self.output, theme='auto', page=1, scale=1.5,
                                         headless=True, extra_args=['--embed-diagram']), (100.5, 200))
         self.assertEqual(self.output.read_bytes(), data)
         self.assertEqual(self.source.read_bytes(), self.before)
@@ -161,7 +161,32 @@ class SvgExportTests(unittest.TestCase):
                                  ('--page-index', '2'), ('--scale', '1.5')):
             self.assertEqual(cmd[cmd.index(option) + 1], expected)
         self.assertIn('--embed-diagram', cmd)
+        self.assertIn('--transparent', cmd)
         self.assertEqual(sorted(p.name for p in self.root.iterdir()), ['out.svg', 'source.drawio'])
+
+    def test_default_light_freezes_colors_and_paints_white_viewbox(self):
+        data = self.svg().replace(b'height="200px"', b'height="200px" viewBox="-10 -20 100.5 200"')
+        data = data.replace(b'</svg>', b'<foreignObject><div xmlns="http://www.w3.org/1999/xhtml" '
+                            b'style="color: light-dark(rgb(10, 20, 30), rgba(200, 210, 220, 0.5)); '
+                            b'font-size: 14px;">CPU &amp; Memory</div></foreignObject></svg>')
+        with patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)) as run:
+            self.assertEqual(export_svg(self.source, self.output), (100.5, 200))
+        root = ET.parse(self.output).getroot()
+        background = root[0]
+        self.assertEqual(background.tag, '{http://www.w3.org/2000/svg}rect')
+        self.assertEqual(background.attrib, {'x': '-10', 'y': '-20', 'width': '100.5', 'height': '200',
+                                            'fill': '#ffffff', 'pointer-events': 'none'})
+        self.assertEqual(root.get('content'), '<mxfile/>')
+        self.assertEqual(root[1].get('style'), 'fill: #ffffff;')
+        label = root.find('.//{http://www.w3.org/1999/xhtml}div')
+        self.assertEqual(label.text, 'CPU & Memory')
+        self.assertEqual(label.get('style'), 'color: rgb(10, 20, 30); font-size: 14px;')
+        self.assertNotIn('light-dark(', self.output.read_text())
+        self.assertNotIn('color-scheme', self.output.read_text())
+        self.assertNotIn('transparent', root.get('style', ''))
+        cmd = run.call_args.args[0]
+        self.assertEqual(cmd[cmd.index('--svg-theme') + 1], 'light')
+        self.assertEqual(self.source.read_bytes(), self.before)
 
     def test_fixed_themes(self):
         for theme in ('light', 'dark'):
@@ -171,7 +196,31 @@ class SvgExportTests(unittest.TestCase):
                 self.assertEqual(export_svg(self.source, self.output, theme=theme), (100.5, 200))
                 cmd = run.call_args.args[0]
                 self.assertEqual(cmd[cmd.index('--svg-theme') + 1], theme)
-                self.assertEqual(self.output.read_bytes(), data)
+                root = ET.parse(self.output).getroot()
+                shapes = list(root.iter('{http://www.w3.org/2000/svg}rect'))
+                self.assertEqual(shapes[-1].get('style'), 'fill: ' + ('#ffffff' if theme == 'light' else '#222222') + ';')
+                self.assertEqual(len(shapes), 2 if theme == 'light' else 1)
+                self.assertNotIn('light-dark(', self.output.read_text())
+                self.assertNotIn('color-scheme', self.output.read_text())
+
+    def test_nested_pairs_gradients_and_stylesheets_keep_non_color_content(self):
+        data = self.svg().replace(b'</svg>', b'<defs><style>.label {color: light-dark(rgb(1, 2, 3), '
+                            b'rgb(4, 5, 6)); color-scheme: light dark; font-weight: bold;}</style>'
+                            b'<linearGradient id="g"><stop stop-color="light-dark(#123456, #abcdef)" '
+                            b'offset="0.5"/></linearGradient></defs>'
+                            b'<path d="M 0 0 L 20 20" fill="url(#g)" stroke="light-dark(light-dark(#111111, '
+                            b'#222222), #333333)" opacity="0.5"/></svg>')
+        with patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)):
+            export_svg(self.source, self.output)
+        root = ET.parse(self.output).getroot()
+        path = root.find('{http://www.w3.org/2000/svg}path')
+        self.assertEqual(path.attrib, {'d': 'M 0 0 L 20 20', 'fill': 'url(#g)', 'stroke': '#111111', 'opacity': '0.5'})
+        stop = root.find('.//{http://www.w3.org/2000/svg}stop')
+        self.assertEqual(stop.attrib, {'stop-color': '#123456', 'offset': '0.5'})
+        css = root.find('.//{http://www.w3.org/2000/svg}style').text
+        self.assertIn('color: rgb(1, 2, 3);', css)
+        self.assertIn('font-weight: bold;', css)
+        self.assertNotIn('color-scheme', css)
 
     def test_invalid_or_nonadaptive_output_preserves_previous_file(self):
         cases = (b'not XML', b'<svg', b'<html/>', b'<svg width="100" height="200"/>',
@@ -183,6 +232,22 @@ class SvgExportTests(unittest.TestCase):
         for data in cases:
             with self.subTest(data=data), patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)):
                 with self.assertRaises(RuntimeError):
+                    export_svg(self.source, self.output, theme='auto')
+                self.assert_unchanged()
+
+    def test_bad_color_functions_and_viewbox_preserve_previous_file(self):
+        for value in ('light-dark(#fff)', 'light-dark(#fff, #000', 'light-dark(#fff, #000, #eee)',
+                      'light-dark(, #000)', 'light-dark(#fff, )'):
+            data = self.svg().replace(b'light-dark(#ffffff, #222222)', value.encode())
+            # Both branches must be present even when only one is selected.
+            with self.subTest(value=value), patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)):
+                with self.assertRaises(RuntimeError):
+                    export_svg(self.source, self.output)
+                self.assert_unchanged()
+        for box in ('0 0 0 200', '0 0 nan 200', '0 0 100', 'invalid'):
+            data = self.svg().replace(b'<svg ', ('<svg viewBox="' + box + '" ').encode())
+            with self.subTest(box=box), patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)):
+                with self.assertRaisesRegex(RuntimeError, 'viewBox'):
                     export_svg(self.source, self.output)
                 self.assert_unchanged()
 
@@ -208,7 +273,8 @@ class SvgExportTests(unittest.TestCase):
         self.assert_unchanged()
 
     def test_cli_infers_svg_and_supports_explicit_format_and_theme(self):
-        for arguments, theme in ((['out.svg'], 'auto'), (['out.drawio.SVG'], 'auto'),
+        for arguments, theme in ((['out.svg'], 'light'), (['out.drawio.SVG'], 'light'),
+                                 (['out.svg', '--theme', 'auto'], 'auto'),
                                  (['out.svg', '--theme', 'dark'], 'dark'),
                                  (['out.image', '--format', 'svg', '--theme', 'light'], 'light')):
             with self.subTest(arguments=arguments), \

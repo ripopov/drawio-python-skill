@@ -6,6 +6,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import shutil
 import struct
 import subprocess
@@ -676,14 +677,93 @@ def export_png(source, output, *, page=0, scale=1, border=10, executable='drawio
                           executable=executable, headless=headless, timeout=timeout, extra_args=extra_args)
 
 
-def export_svg(source, output, *, page=0, scale=1, border=10, theme='auto', executable='drawio', headless=False, timeout=60, extra_args=()):
-    """Export a native SVG, adaptive to the viewer's light/dark scheme by default."""
+def export_svg(source, output, *, page=0, scale=1, border=10, theme='light', executable='drawio', headless=False, timeout=60, extra_args=()):
+    """Export light colors on white by default; theme='auto' is adaptive and transparent."""
     if theme not in ('auto', 'light', 'dark'):
         raise ValueError('SVG theme must be auto, light or dark')
     # --svg-theme also works with Desktop versions predating the shared --theme flag.
     return _export_native(source, output, format='svg', page=page, scale=scale, border=border,
                           executable=executable, headless=headless, timeout=timeout,
-                          extra_args=['--svg-theme', theme] + list(extra_args), theme=theme)
+                          extra_args=['--svg-theme', theme, '--transparent'] + list(extra_args), theme=theme)
+
+
+def _resolve_svg_colors(value, theme):
+    """Resolve native CSS light-dark() pairs, including nested rgb()/rgba() values."""
+    pattern = re.compile(r'\blight-dark\s*\(', re.IGNORECASE)
+    while True:
+        match = pattern.search(value)
+        if not match:
+            return value
+        depth, comma, quote = 1, None, None
+        index = match.end()
+        while index < len(value):
+            char = value[index]
+            if char == '\\':
+                index += 2
+                continue
+            if quote:
+                if char == quote:
+                    quote = None
+            elif char in ('"', "'"):
+                quote = char
+            elif char == '(':
+                depth += 1
+            elif char == ')':
+                depth -= 1
+                if depth == 0:
+                    break
+            elif char == ',' and depth == 1:
+                if comma is not None:
+                    raise RuntimeError('Invalid light-dark() color in rendered SVG')
+                comma = index
+            index += 1
+        if depth or comma is None:
+            raise RuntimeError('Invalid light-dark() color in rendered SVG')
+        light, dark = value[match.end():comma].strip(), value[comma + 1:index].strip()
+        if not light or not dark:
+            raise RuntimeError('Empty light-dark() color in rendered SVG')
+        value = value[:match.start()] + (light if theme == 'light' else dark) + value[index + 1:]
+
+
+def _static_svg(data, theme):
+    """Freeze the exported palette without changing geometry, labels or source data."""
+    root = ET.fromstring(data)
+    svg_ns = 'http://www.w3.org/2000/svg'
+    for element in root.iter():
+        for key, value in list(element.attrib.items()):
+            if key in ('style', 'fill', 'stroke', 'color', 'stop-color', 'flood-color', 'lighting-color'):
+                value = _resolve_svg_colors(value, theme)
+                if key == 'style':
+                    value = re.sub(r'(?<![\w-])color-scheme\s*:[^;}]*(?:;|(?=\})|$)', '', value, flags=re.IGNORECASE)
+                if value.strip():
+                    element.set(key, value.strip())
+                else:
+                    element.attrib.pop(key, None)
+        if element.tag.rsplit('}', 1)[-1] == 'style' and element.text:
+            element.text = _resolve_svg_colors(element.text, theme)
+            element.text = re.sub(r'(?<![\w-])color-scheme\s*:[^;}]*(?:;|(?=\})|$)', '', element.text, flags=re.IGNORECASE)
+    if theme == 'light':
+        # An actual painted rectangle works in image previews and non-CSS SVG viewers.
+        box = re.split(r'[\s,]+', root.get('viewBox', '').strip()) if root.get('viewBox') else [
+            '0', '0', root.get('width', '').removesuffix('px'), root.get('height', '').removesuffix('px')]
+        try:
+            valid_box = len(box) == 4 and all(math.isfinite(float(part)) for part in box)
+            valid_box = valid_box and float(box[2]) > 0 and float(box[3]) > 0
+        except ValueError:
+            valid_box = False
+        if not valid_box:
+            raise RuntimeError('Renderer produced SVG with invalid viewBox')
+        root_style = re.sub(r'\bbackground(?:-color)?\s*:[^;]*(?:;|$)', '', root.get('style', ''), flags=re.IGNORECASE)
+        if root_style.strip():
+            root.set('style', root_style.strip())
+        else:
+            root.attrib.pop('style', None)
+        root.insert(0, ET.Element('{' + svg_ns + '}rect', dict(zip(('x', 'y', 'width', 'height'), box),
+                                 fill='#ffffff', **{'pointer-events': 'none'})))
+    ET.register_namespace('', svg_ns)
+    ET.register_namespace('xlink', 'http://www.w3.org/1999/xlink')
+    ET.register_namespace('html', 'http://www.w3.org/1999/xhtml')
+    return ET.tostring(root, encoding='utf-8', xml_declaration=True) + b'\n'
 
 
 def _svg_dimensions(data, theme):
@@ -736,6 +816,8 @@ def _export_native(source, output, *, format, page, scale, border, executable, h
         data = temporary.read_bytes()
         if format == 'svg':
             width, height = _svg_dimensions(data, theme)
+            if theme != 'auto':
+                temporary.write_bytes(_static_svg(data, theme))
         else:
             if len(data) < 24 or data[:8] != b'\x89PNG\r\n\x1a\n':
                 raise RuntimeError('Renderer did not produce PNG')
@@ -759,11 +841,11 @@ def main():
     add_fix_arguments(commands.add_parser('native-fix', help='Conservative label-offset repair; verified dry-run unless --output is supplied'))
     from drawio_stack import add_arguments as add_stack_arguments, run as run_native_stack_fix
     add_stack_arguments(commands.add_parser('native-stack-fix', help='Independent stacking-only repair for hidden labels; dry-run by default'))
-    export = commands.add_parser('export', help='Native PNG or SVG export; SVG colors adapt by default')
+    export = commands.add_parser('export', help='Native PNG or SVG export; SVG defaults to light colors on white')
     export.add_argument('source')
     export.add_argument('output')
     export.add_argument('--format', choices=('png', 'svg'), help='Defaults to SVG for .svg output, otherwise PNG')
-    export.add_argument('--theme', choices=('auto', 'light', 'dark'), help='SVG appearance (default: auto, adapts to viewer)')
+    export.add_argument('--theme', choices=('auto', 'light', 'dark'), help='SVG appearance (default: light on white; auto is adaptive and transparent)')
     export.add_argument('--page', type=int, default=0)
     export.add_argument('--scale', type=float, default=1)
     export.add_argument('--border', type=int, default=10)
@@ -799,7 +881,7 @@ def main():
     if format == 'png' and args.theme is not None:
         parser.error('--theme applies only to SVG export')
     exporter = export_svg if format == 'svg' else export_png
-    options = {'theme': args.theme or 'auto'} if format == 'svg' else {}
+    options = {'theme': args.theme or 'light'} if format == 'svg' else {}
     print(exporter(args.source, args.output, page=args.page, scale=args.scale, border=args.border, headless=args.headless, executable=args.executable, extra_args=['--no-sandbox'] if args.no_sandbox else (), **options))
     return 0
 

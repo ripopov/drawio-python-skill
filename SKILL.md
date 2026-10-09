@@ -58,6 +58,16 @@ Ordinary geometry is in pixels relative to the parent's top-left. Ports use frac
 
 `p.connect()` binds endpoints, chooses a simple orthogonal dogleg, and preserves the explicit polyline. Use `lane=...` for an outside return lane, or `via=[(x,y), ...]` for **every** turn on a longer path. It checks orthogonality and that the route approaches the chosen sides from outside. It does not avoid obstacles automatically. Use different attachment fractions/lane coordinates for different signals. On a long connector, `label_segment=...` selects a leg for its label; `label_offset=(dx,dy)` leaves space from the line.
 
+For named ports on connected units, prefer editable connection-end labels with `p.edge_label()`: `position=-1` places the source port name and `position=1` the target port name. Keep the main connection label for the protocol or width. For a left-to-right connection:
+
+```python
+edge = p.connect(a, b, 'AXI4')
+p.edge_label(edge, 'm_axi', position=-1, offset=(25, -12))
+p.edge_label(edge, 's_axi', position=1, offset=(-25, -12))
+```
+
+Offsets are pixels; adjust them for the route direction, text width and available space. If explicit port objects are needed, create unnamed anchors with `p.port(unit, '', ...)` and bind the connection to their IDs; see [ports and bound connectors](docs/api.md#ports-and-bound-connectors). Ports that must remain named when unconnected should keep labels on the unit or port itself. Child edge labels are included in `assert_connections()`, so the expected label for this example is `'AXI4 m_axi s_axi'`.
+
 Reserve corridors before wiring dense SoC diagrams. Keep data/control/clock paths distinguishable; label only specified widths/protocols. Represent misses as a result of lookup, include both victim data and replacement control, and show refill completion when requested. A connected picture still needs a check against the prompt's actual semantics. For BPMN-style requests, preserve specified shapes even when they differ from strict BPMN. For ER cardinality, use native `ERone`/`ERmany` markers; a label `1:M` on an ordinary arrow is insufficient.
 
 ## Check and finish

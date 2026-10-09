@@ -2,7 +2,7 @@
 
 Optional rendered collision verification is available through `from drawio_native import native_check` or the `native-check` CLI command. See [native checking and fixes](native-check.md) for its dependencies, report schema and usage. Ordinary generation/editing remains independent of the browser.
 
-Import `Diagram`, `style`, `BLOCK`, `EDGE`, `TEXT`, `export_png` from `drawio_arch` by putting this skill's `scripts` directory on `PYTHONPATH`. All parameters after `*` are keyword-only. IDs are strings scoped to one page. Returned IDs are the handles for later operations. No third-party Python modules are imported.
+Import `Diagram`, `style`, `BLOCK`, `EDGE`, `TEXT`, `export_png`, `export_svg` from `drawio_arch` by putting this skill's `scripts` directory on `PYTHONPATH`. All parameters after `*` are keyword-only. IDs are strings scoped to one page. Returned IDs are the handles for later operations. No third-party Python modules are imported.
 
 ## Document and page
 
@@ -175,3 +175,25 @@ python3 "$SKILL_DIR/scripts/drawio_arch.py" export input.drawio output.png --pag
 ```
 
 `extra_args` can pass supported native exporter options such as `--embed-diagram` or `--transparent`. Check the installed Desktop's `--help`; capabilities differ between versions. PNGs can crop to diagram bounds; page width/height in XML remain the editable canvas size. Multi-page files require a separate PNG export per page. Never describe a cropped PNG as exact page-sized output.
+
+## Native SVG export
+
+```python
+export_svg('/tmp/design.drawio', '/tmp/design.svg', page=0,
+           scale=1.5, border=10, headless=True)
+```
+
+`export_svg(source, output, *, page=0, scale=1, border=10, theme='auto', executable='drawio', headless=False, timeout=60, extra_args=())` shares the PNG export prerequisites, page indexing, Snap path restrictions and atomic replacement behavior. It returns `(width, height)` in pixels, which can be fractional. It verifies SVG XML, positive finite dimensions, and an adaptive root color scheme when `theme='auto'`. Invalid output, renderer errors and timeouts leave an existing destination untouched. Adaptive export requires Draw.io Desktop 26+; an older renderer that emits fixed colors causes an explicit error.
+
+CLI equivalents:
+
+```bash
+python3 "$SKILL_DIR/scripts/drawio_arch.py" export input.drawio output.svg --headless
+python3 "$SKILL_DIR/scripts/drawio_arch.py" export input.drawio output.svg --theme dark --headless
+```
+
+The CLI selects SVG for a `.svg` output (including `.drawio.svg`), otherwise PNG. `--format svg` or `--format png` overrides selection. `--theme auto|light|dark` applies only to SVG and defaults to `auto`. The wrapper uses Desktop's compatible `--svg-theme` flag, including on releases before the shared native `--theme` flag was introduced.
+
+Adaptive SVG preserves Draw.io's native `light-dark()` color pairs and `color-scheme: light dark`; no filter or palette rewrite is applied. [Draw.io's adaptive SVG documentation](https://jgraph.github.io/drawio-github/DARK-MODE.html) describes how the containing page or image supplies the color scheme. A VS Code preview must expose its selected theme as a CSS color scheme to trigger switching. Explicit source page adaptive-color settings, including disabled adaptation and custom color pairs, remain authoritative. `theme='light'` or `theme='dark'` selects a fixed appearance.
+
+Native SVG may contain HTML labels (`foreignObject`), so viewers need support for those labels and modern CSS for adaptive colors. Use `extra_args=['--embed-diagram']` to include editable diagram data; SVG export does not embed it by default. Multi-page sources require one export per page.

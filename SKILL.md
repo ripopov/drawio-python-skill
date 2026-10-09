@@ -1,13 +1,13 @@
 ---
 name: drawio-python-arch
-description: Generate and edit editable Draw.io diagrams with a bundled Python standard-library API. Use for SoC hardware architecture, microarchitecture, flowcharts, schemas, swimlanes, networks and native-shape illustrations. Includes deterministic connections, records, structural checks, optional PNG export, native label collision verification and conservative label repair.
+description: Generate and edit editable Draw.io diagrams with a bundled Python standard-library API. Use for SoC hardware architecture, microarchitecture, flowcharts, schemas, swimlanes, networks and native-shape illustrations. Includes deterministic connections, records, structural checks, optional PNG and adaptive SVG export, native label collision verification and conservative label repair.
 ---
 
 # Draw.io with Python
 
 Use `scripts/drawio_arch.py`; no pip install is needed. Deliver native editable cells and text. `save()` writes indented, multiline XML and validates it before replacing a file.
 
-Requires Python 3.9+ and a local filesystem. Generation and editing need no third-party Python packages or network access. Optional PNG export requires Draw.io Desktop; headless Linux export also requires Xvfb.
+Requires Python 3.9+ and a local filesystem. Generation and editing need no third-party Python packages or network access. Optional PNG/SVG export requires Draw.io Desktop (26+ for adaptive SVG); headless Linux export also requires Xvfb.
 
 Optional native label collision checking requires local Draw.io assets and Chromium/Chrome. It uses browser-measured text bounds and needs no extra Python packages.
 
@@ -65,6 +65,7 @@ Reserve corridors before wiring dense SoC diagrams. Keep data/control/clock path
 ```bash
 python3 "$SKILL_DIR/scripts/drawio_arch.py" inspect /absolute/user/workspace/design.drawio
 python3 "$SKILL_DIR/scripts/drawio_arch.py" export /absolute/user/workspace/design.drawio /absolute/user/workspace/design.png --headless
+python3 "$SKILL_DIR/scripts/drawio_arch.py" export /absolute/user/workspace/design.drawio /absolute/user/workspace/design.svg --headless
 ```
 
 `save()` already checks structure. `inspect` reports connections by ID and conservative bounds/manual-route warnings and estimated edge-label overlaps. For specified topology, use `p.assert_connections([(source_id, target_id, label), ...])`; child edge labels are included. These helpers avoid writing a new XML/SVG checker for each diagram.
@@ -77,7 +78,10 @@ For requested overlap fixes, use `native-fix design.drawio` for a verified dry-r
 
 For `possible-label-occlusion` warnings, consider the separate `native-stack-fix design.drawio` first; the warning includes this suggestion. Read [stacking-only repair](docs/native-stack-fix.md). It keeps label positions/styles fixed and tests a minimal reorder of the owning edge above a sibling shape. Use `--output design-stacked.drawio` to apply to a new file. Reordering also raises the line, so the fixer rejects unsafe crossings/obscuration and cross-layer cases. Neither fixer invokes the other.
 
-PNG export uses optional Draw.io Desktop. `--headless` also needs Xvfb; omit it with a working display. Use `--no-sandbox` only when the execution environment requires Electron's flag. Library `--page 0` means the first page. PNGs can crop to content.
+Image export selects SVG for a `.svg` output, otherwise PNG; `--format svg` or `--format png` overrides this. SVG defaults to adaptive light/dark colors (`--theme auto`); use `--theme light` or `--theme dark` only when fixed colors are requested. Python callers can use `export_svg(..., theme='auto')`. Adaptive SVG follows the viewer's CSS color scheme; VS Code previews must expose that scheme to follow the selected editor theme. Source page adaptive-color settings are retained.
+Hardcoded hex colors on shapes and labels still receive dark-mode variants in adaptive SVG export unless the source diagram explicitly disables adaptive colors.
+
+PNG/SVG export uses optional Draw.io Desktop. `--headless` also needs Xvfb; omit it with a working display. Use `--no-sandbox` only when the execution environment requires Electron's flag. Library `--page 0` means the first page. Images can crop to content. Both exporters validate the native output before atomically replacing the destination; failed exports preserve existing files.
 
 If image viewing is available, inspect one native render, fix concrete defects, and re-render affected pages. If the model/tool cannot view images, use the bundled checks and report that visual inspection was unavailable. Do not repeatedly retry an unsupported image tool or build a bespoke SVG parser to claim visual verification. Bounds checks do not measure text or reproduce native autorouting. Once required topology and available checks pass and observed defects are fixed, deliver the files at the requested path.
 

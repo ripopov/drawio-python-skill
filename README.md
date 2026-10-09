@@ -51,10 +51,10 @@ Ask your agent to use `drawio-python-arch`, for example:
 Requirements:
 
 - Python 3.9+; no pip dependencies.
-- Draw.io Desktop for PNG export and renderer assets; Xvfb for headless Linux export.
+- Draw.io Desktop for PNG/SVG export and renderer assets (26+ for adaptive SVG); Xvfb for headless Linux export.
 - Chromium/Chrome for native checks and automatic fixes.
 
-For PNG commands, omit `--headless` when a display is available. Add `--no-sandbox` only where the browser sandbox cannot run; use `--help` for explicit renderer paths.
+For image export commands, omit `--headless` when a display is available. Add `--no-sandbox` only where the browser sandbox cannot run; use `--help` for explicit renderer paths.
 
 Install on **Ubuntu 22.04/24.04 (`amd64`)**:
 
@@ -73,7 +73,7 @@ sudo apt install -y "$drawio_deps_dir/google-chrome.deb"
 
 Snap assets are auto-detected at `/snap/drawio/current/app/resources/app.asar`; use `--drawio-asar /snap/drawio/current/app/resources/app.asar` to override this for native checks, fixers and the documentation script.
 
-For Snap PNG export, keep sources, outputs and working copies in non-hidden directories under `$HOME`, including report directories. Snap cannot access host `/tmp` files. This workflow was reported verified on Ubuntu AMD64, Draw.io rev 305 (31.7.0), Chrome, Xvfb and Python 3.12:
+For Snap PNG/SVG export, keep sources, outputs and working copies in non-hidden directories under `$HOME`, including report directories. Snap cannot access host `/tmp` files. This workflow was reported verified on Ubuntu AMD64, Draw.io rev 305 (31.7.0), Chrome, Xvfb and Python 3.12:
 
 ```bash
 python3 examples/generate.py --output-dir "$HOME/drawio-demo"
@@ -112,6 +112,14 @@ Export a PNG:
 ```bash
 python3 scripts/drawio_arch.py export "$drawio_demo_dir/axi_test_system.drawio" "$drawio_demo_dir/axi_test_system.png" --headless
 ```
+
+Export an SVG with adaptive light/dark colors (the default):
+
+```bash
+python3 scripts/drawio_arch.py export "$drawio_demo_dir/axi_test_system.drawio" "$drawio_demo_dir/axi_test_system.svg" --headless
+```
+
+The output extension selects SVG or PNG; `--format svg|png` overrides it. For SVG, `--theme light` or `--theme dark` selects fixed colors. Adaptive SVG follows the viewer's CSS color scheme, so VS Code preview behavior depends on the preview exposing the selected theme. The Python API provides `export_svg(...)` alongside `export_png(...)`; both preserve existing outputs on failure.
 
 Get a native check as JSON:
 

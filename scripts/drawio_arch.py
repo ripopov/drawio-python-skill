@@ -666,18 +666,55 @@ def _export_failure(result):
             return line[:2000]
     if lines:
         return '\n'.join(lines)[:2000]
-    return (f'No actionable renderer output (exit code {result.returncode}); no PNG was produced. '
+    return (f'No actionable renderer output (exit code {result.returncode}); no image was produced. '
             'Check source/output access and the display or --headless setup.')
 
 
 def export_png(source, output, *, page=0, scale=1, border=10, executable='drawio', headless=False, timeout=60, extra_args=()):
     """Native renderer; Draw.io Desktop is an optional external application."""
+    return _export_native(source, output, format='png', page=page, scale=scale, border=border,
+                          executable=executable, headless=headless, timeout=timeout, extra_args=extra_args)
+
+
+def export_svg(source, output, *, page=0, scale=1, border=10, theme='auto', executable='drawio', headless=False, timeout=60, extra_args=()):
+    """Export a native SVG, adaptive to the viewer's light/dark scheme by default."""
+    if theme not in ('auto', 'light', 'dark'):
+        raise ValueError('SVG theme must be auto, light or dark')
+    # --svg-theme also works with Desktop versions predating the shared --theme flag.
+    return _export_native(source, output, format='svg', page=page, scale=scale, border=border,
+                          executable=executable, headless=headless, timeout=timeout,
+                          extra_args=['--svg-theme', theme] + list(extra_args), theme=theme)
+
+
+def _svg_dimensions(data, theme):
+    try:
+        root = ET.fromstring(data)
+    except ET.ParseError as exc:
+        raise RuntimeError('Renderer did not produce valid SVG') from exc
+    if root.tag != '{http://www.w3.org/2000/svg}svg':
+        raise RuntimeError('Renderer did not produce SVG')
+    try:
+        width, height = (float(root.get(key, '').removesuffix('px')) for key in ('width', 'height'))
+    except ValueError as exc:
+        raise RuntimeError('Renderer produced SVG with invalid dimensions') from exc
+    if not all(math.isfinite(value) and value > 0 for value in (width, height)):
+        raise RuntimeError('Renderer produced SVG with empty or invalid dimensions')
+    if theme == 'auto':
+        styles = dict(item.split(':', 1) for item in root.get('style', '').split(';') if ':' in item)
+        scheme = next((value for key, value in styles.items() if key.strip() == 'color-scheme'), '')
+        if not {'light', 'dark'} <= set(scheme.split()):
+            raise RuntimeError('Renderer did not produce adaptive SVG; use Draw.io Desktop 26+ '
+                               'or select theme="light" or theme="dark" for fixed colors')
+    return width, height
+
+
+def _export_native(source, output, *, format, page, scale, border, executable, headless, timeout, extra_args, theme=None):
     if page < 0 or scale <= 0 or border < 0:
         raise ValueError('Invalid export options')
     source, output = Path(source).resolve(), Path(output).resolve()
     renderer = shutil.which(executable)
     if not renderer:
-        raise RuntimeError('Native PNG export requires Draw.io Desktop on PATH (generation does not)')
+        raise RuntimeError(f'Native {format.upper()} export requires Draw.io Desktop on PATH (generation does not)')
     if _is_snap_executable(renderer):
         _check_snap_export_paths(source, output)
     if page >= len(Diagram.load(source).pages):
@@ -686,8 +723,8 @@ def export_png(source, output, *, page=0, scale=1, border=10, executable='drawio
         raise ValueError('Export must not overwrite source')
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=str(output.parent)) as directory:
-        temporary = Path(directory) / 'render.png'
-        cmd = [executable, '--export', '--format', 'png', '--page-index', str(page + 1), '--scale', str(scale), '--border', str(border), '--output', str(temporary)] + list(extra_args) + [str(source)]
+        temporary = Path(directory) / ('render.' + format)
+        cmd = [executable, '--export', '--format', format, '--page-index', str(page + 1), '--scale', str(scale), '--border', str(border), '--output', str(temporary)] + list(extra_args) + [str(source)]
         if headless:
             if not shutil.which('xvfb-run'):
                 raise RuntimeError('Headless native export requires xvfb-run')
@@ -697,11 +734,14 @@ def export_png(source, output, *, page=0, scale=1, border=10, executable='drawio
         if result.returncode or not temporary.exists():
             raise RuntimeError('Native export failed: ' + _export_failure(result))
         data = temporary.read_bytes()
-        if len(data) < 24 or data[:8] != b'\x89PNG\r\n\x1a\n':
-            raise RuntimeError('Renderer did not produce PNG')
-        width, height = struct.unpack('>II', data[16:24])
-        if not width or not height:
-            raise RuntimeError('Empty PNG')
+        if format == 'svg':
+            width, height = _svg_dimensions(data, theme)
+        else:
+            if len(data) < 24 or data[:8] != b'\x89PNG\r\n\x1a\n':
+                raise RuntimeError('Renderer did not produce PNG')
+            width, height = struct.unpack('>II', data[16:24])
+            if not width or not height:
+                raise RuntimeError('Empty PNG')
         os.replace(temporary, output)
         return width, height
 
@@ -719,9 +759,11 @@ def main():
     add_fix_arguments(commands.add_parser('native-fix', help='Conservative label-offset repair; verified dry-run unless --output is supplied'))
     from drawio_stack import add_arguments as add_stack_arguments, run as run_native_stack_fix
     add_stack_arguments(commands.add_parser('native-stack-fix', help='Independent stacking-only repair for hidden labels; dry-run by default'))
-    export = commands.add_parser('export')
+    export = commands.add_parser('export', help='Native PNG or SVG export; SVG colors adapt by default')
     export.add_argument('source')
     export.add_argument('output')
+    export.add_argument('--format', choices=('png', 'svg'), help='Defaults to SVG for .svg output, otherwise PNG')
+    export.add_argument('--theme', choices=('auto', 'light', 'dark'), help='SVG appearance (default: auto, adapts to viewer)')
     export.add_argument('--page', type=int, default=0)
     export.add_argument('--scale', type=float, default=1)
     export.add_argument('--border', type=int, default=10)
@@ -729,7 +771,7 @@ def main():
     export.add_argument('--executable', default='drawio')
     assets = export.add_mutually_exclusive_group()
     for flag in ('--drawio-asar', '--drawio-webapp'):
-        assets.add_argument(flag, help='Accepted for CLI compatibility; PNG export uses '
+        assets.add_argument(flag, help='Accepted for CLI compatibility; image export uses '
                             '--executable and ignores this asset path')
     export.add_argument('--no-sandbox', action='store_true', help='Pass Electron flag only where required by the environment')
     args = parser.parse_args()
@@ -753,7 +795,12 @@ def main():
             print(json.dumps({'page': page.diagram.get('name'), 'connections': edges, 'layout_warnings': page.layout_warnings(), 'estimated_label_warnings': page.label_warnings()}, indent=2, ensure_ascii=False))
         print('Bounds/manual routes checked; label overlaps estimated with approximate fonts. Native autoroutes, text fitting and symbols still need inspection.')
         return 0
-    print(export_png(args.source, args.output, page=args.page, scale=args.scale, border=args.border, headless=args.headless, executable=args.executable, extra_args=['--no-sandbox'] if args.no_sandbox else ()))
+    format = args.format or ('svg' if Path(args.output).suffix.lower() == '.svg' else 'png')
+    if format == 'png' and args.theme is not None:
+        parser.error('--theme applies only to SVG export')
+    exporter = export_svg if format == 'svg' else export_png
+    options = {'theme': args.theme or 'auto'} if format == 'svg' else {}
+    print(exporter(args.source, args.output, page=args.page, scale=args.scale, border=args.border, headless=args.headless, executable=args.executable, extra_args=['--no-sandbox'] if args.no_sandbox else (), **options))
     return 0
 
 

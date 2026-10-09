@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 import zlib
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'examples'))
-from drawio_arch import Diagram, style, export_png, _is_snap_executable, main
+from drawio_arch import Diagram, style, export_png, export_svg, _is_snap_executable, main
 import generate
 import detail
 import manufacturing
@@ -113,6 +113,119 @@ class ExportTests(unittest.TestCase):
                     patch('builtins.print'):
                 self.assertEqual(main(), 0)
                 self.assertEqual(export.call_args.kwargs['executable'], '/custom/drawio')
+
+
+class SvgExportTests(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        doc = Diagram()
+        doc.page('First').node('CPU', 0, 0)
+        doc.page('Second').node('Memory', 0, 0)
+        self.source = doc.save(self.root / 'source.drawio')
+        self.before = self.source.read_bytes()
+        self.output = self.root / 'out.svg'
+        self.output.write_bytes(b'previous SVG')
+        self.which = patch('drawio_arch.shutil.which', return_value='/opt/drawio/drawio')
+        self.which.start()
+        self.addCleanup(self.which.stop)
+
+    def svg(self, scheme='light dark'):
+        return (f'<svg xmlns="http://www.w3.org/2000/svg" width="100.5px" height="200px" '
+                f'style="background: transparent; color-scheme: {scheme};" content="&lt;mxfile/&gt;">'
+                '<rect width="100" height="200" fill="#ffffff" '
+                'style="fill: light-dark(#ffffff, #222222);"/></svg>').encode()
+
+    def renderer(self, data):
+        def render(cmd, **kwargs):
+            Path(cmd[cmd.index('--output') + 1]).write_bytes(data)
+            return subprocess.CompletedProcess(cmd, 0, '', '')
+        return render
+
+    def assert_unchanged(self):
+        self.assertEqual(self.source.read_bytes(), self.before)
+        self.assertEqual(self.output.read_bytes(), b'previous SVG')
+        self.assertEqual(sorted(p.name for p in self.root.iterdir()), ['out.svg', 'source.drawio'])
+
+    def test_adaptive_default_preserves_native_svg_and_selects_page(self):
+        data = self.svg()
+        with patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)) as run:
+            self.assertEqual(export_svg(self.source, self.output, page=1, scale=1.5,
+                                        headless=True, extra_args=['--embed-diagram']), (100.5, 200))
+        self.assertEqual(self.output.read_bytes(), data)
+        self.assertEqual(self.source.read_bytes(), self.before)
+        cmd = run.call_args.args[0]
+        self.assertEqual(cmd[:2], ['xvfb-run', '-a'])
+        for option, expected in (('--format', 'svg'), ('--svg-theme', 'auto'),
+                                 ('--page-index', '2'), ('--scale', '1.5')):
+            self.assertEqual(cmd[cmd.index(option) + 1], expected)
+        self.assertIn('--embed-diagram', cmd)
+        self.assertEqual(sorted(p.name for p in self.root.iterdir()), ['out.svg', 'source.drawio'])
+
+    def test_fixed_themes(self):
+        for theme in ('light', 'dark'):
+            data = self.svg(theme).replace(b'100.5px', b'100.5')
+            with self.subTest(theme=theme), \
+                    patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)) as run:
+                self.assertEqual(export_svg(self.source, self.output, theme=theme), (100.5, 200))
+                cmd = run.call_args.args[0]
+                self.assertEqual(cmd[cmd.index('--svg-theme') + 1], theme)
+                self.assertEqual(self.output.read_bytes(), data)
+
+    def test_invalid_or_nonadaptive_output_preserves_previous_file(self):
+        cases = (b'not XML', b'<svg', b'<html/>', b'<svg width="100" height="200"/>',
+                 self.svg().replace(b'100.5px', b'0px'),
+                 self.svg().replace(b'200px', b'nan'),
+                 self.svg().replace(b'200px', b'inf'),
+                 self.svg().replace(b'200px', b'10%'),
+                 self.svg('light'), self.svg('dark'))
+        for data in cases:
+            with self.subTest(data=data), patch('drawio_arch.subprocess.run', side_effect=self.renderer(data)):
+                with self.assertRaises(RuntimeError):
+                    export_svg(self.source, self.output)
+                self.assert_unchanged()
+
+    def test_renderer_failure_missing_output_and_timeout_preserve_previous_file(self):
+        cases = (subprocess.CompletedProcess([], 1, '', 'export failed'),
+                 subprocess.CompletedProcess([], 0, '', ''),
+                 subprocess.TimeoutExpired('drawio', 60))
+        for result in cases:
+            effect = {'side_effect': result} if isinstance(result, Exception) else {'return_value': result}
+            with self.subTest(result=result), patch('drawio_arch.subprocess.run', **effect):
+                with self.assertRaises((RuntimeError, subprocess.TimeoutExpired)):
+                    export_svg(self.source, self.output)
+                self.assert_unchanged()
+
+    def test_invalid_options_do_not_launch_renderer(self):
+        with patch('drawio_arch.subprocess.run') as run:
+            for options in ({'theme': 'invalid'}, {'page': -1}, {'page': 2}, {'scale': 0}, {'border': -1}):
+                with self.subTest(options=options), self.assertRaises(ValueError):
+                    export_svg(self.source, self.output, **options)
+            with self.assertRaisesRegex(ValueError, 'overwrite source'):
+                export_svg(self.source, self.source)
+            run.assert_not_called()
+        self.assert_unchanged()
+
+    def test_cli_infers_svg_and_supports_explicit_format_and_theme(self):
+        for arguments, theme in ((['out.svg'], 'auto'), (['out.drawio.SVG'], 'auto'),
+                                 (['out.svg', '--theme', 'dark'], 'dark'),
+                                 (['out.image', '--format', 'svg', '--theme', 'light'], 'light')):
+            with self.subTest(arguments=arguments), \
+                    patch('sys.argv', ['drawio_arch.py', 'export', 'source.drawio'] + arguments), \
+                    patch('drawio_arch.export_svg', return_value=(100, 200)) as export, \
+                    patch('drawio_arch.export_png') as png, patch('builtins.print'):
+                self.assertEqual(main(), 0)
+                self.assertEqual(export.call_args.kwargs['theme'], theme)
+                png.assert_not_called()
+
+    def test_cli_rejects_svg_theme_for_png(self):
+        with patch('sys.argv', ['drawio_arch.py', 'export', 'source.drawio', 'out.png', '--theme', 'auto']), \
+                patch('drawio_arch.export_png') as png, patch('sys.stderr'):
+            with self.assertRaises(SystemExit) as exit:
+                main()
+            self.assertEqual(exit.exception.code, 2)
+            png.assert_not_called()
 
 
 class DiagramTests(unittest.TestCase):
